@@ -1,0 +1,16 @@
+{
+  "name": "chaos-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static dashboard - no build step'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}

