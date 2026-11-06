@@ -1,9 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "echo 'Static dashboard'",
+  "buildCommand": "npm run build",
   "devCommand": "vercel dev",
   "installCommand": "npm install",
+  "outputDirectory": "public",
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30
@@ -20,9 +21,8 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/dashboard/index.html" },
-    { "source": "/dashboard", "destination": "/dashboard/index.html" },
-    { "source": "/dashboard/(.*)", "destination": "/dashboard/$1" },
-    { "source": "/app.js", "destination": "/dashboard/app.js" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/dashboard/(.*)", "destination": "/$1" }
   ]
 }

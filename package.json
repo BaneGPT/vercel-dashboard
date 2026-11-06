@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Static dashboard - no build step'",
+    "build": "mkdir -p public && cp -r dashboard/* public/",
     "deploy": "vercel --prod"
   },
   "dependencies": {
