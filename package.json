@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "mkdir -p public && cp -r dashboard/* public/",
+    "build": "if not exist public mkdir public && xcopy /E /I /Y dashboard public\\",
     "deploy": "vercel --prod"
   },
   "dependencies": {
