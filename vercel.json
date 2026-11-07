@@ -6,9 +6,18 @@
   "installCommand": "npm install",
   "outputDirectory": "public",
   "functions": {
-    "api/**/*.js": {
-      "maxDuration": 30
-    }
+    "api/auth/verify.js": { "maxDuration": 30 },
+    "api/campaigns/index.js": { "maxDuration": 30 },
+    "api/systems/index.js": { "maxDuration": 30 },
+    "api/stats/index.js": { "maxDuration": 30 },
+    "api/affiliates/index.js": { "maxDuration": 30 },
+    "api/affiliates/auth.js": { "maxDuration": 30 },
+    "api/affiliates/payouts.js": { "maxDuration": 30 },
+    "api/affiliates/referrals.js": { "maxDuration": 30 },
+    "api/negotiations/index.js": { "maxDuration": 30 },
+    "api/negotiations/proof.js": { "maxDuration": 30 },
+    "api/payments/index.js": { "maxDuration": 30 },
+    "api/payments/webhooks.js": { "maxDuration": 30 }
   },
   "headers": [
     {
