@@ -73,7 +73,6 @@ function createIcon(name, size = 20) {
 // ============================================
 const $ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
 const $$ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return Array.from(t.content.children); };
-const cn = (...c) => c.filter(Boolean).join(' ');
 const formatNumber = (n) => (n ?? 0).toLocaleString();
 const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
 const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
