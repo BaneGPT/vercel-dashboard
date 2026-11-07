@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chaos C2 - Command & Control Dashboard</title>
+  <title>Chaos C2 — Command & Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -12,44 +12,82 @@
         extend: {
           colors: {
             chaos: {
-              50: '#fdf8f0', 100: '#faebe0', 200: '#f4d3b5', 300: '#eab778',
-              400: '#e09542', 500: '#d6781e', 600: '#c45f15', 700: '#a04512',
-              800: '#813713', 900: '#683013', 950: '#381507'
+              50: '#fef7f0', 100: '#fdedeb', 200: '#fad9c9', 300: '#f5bb8a',
+              400: '#ee954d', 500: '#e6731d', 600: '#d45d14', 700: '#b04711',
+              800: '#8d3911', 900: '#713010', 950: '#3d1807'
             },
             acc: {
-              emerald: '#10b981', emeraldDim: 'rgba(16,185,129,0.15)',
-              amber: '#f59e0b', amberDim: 'rgba(245,158,11,0.15)',
-              rose: '#f43f5e', roseDim: 'rgba(244,63,94,0.15)',
-              sky: '#0ea5e9', skyDim: 'rgba(14,165,233,0.15)',
-              violet: '#8b5cf6', violetDim: 'rgba(139,92,246,0.15)',
-              cyan: '#06b6d4', cyanDim: 'rgba(6,182,212,0.15)'
+              emerald: '#0ec77d', emeraldDim: 'rgba(14,199,125,0.12)',
+              amber: '#f59e0b', amberDim: 'rgba(245,158,11,0.12)',
+              rose: '#f43f5e', roseDim: 'rgba(244,63,94,0.12)',
+              sky: '#0ea5e9', skyDim: 'rgba(14,165,233,0.12)',
+              violet: '#8b5cf6', violetDim: 'rgba(139,92,246,0.12)',
+              cyan: '#06b6d4', cyanDim: 'rgba(6,182,212,0.12)'
             },
             surface: {
-              950: '#050505', 900: '#0d0d0d', 850: '#141414', 
-              800: '#1c1c1c', 750: '#242424', 700: '#2d2d2d'
+              950: '#030303', 900: '#0a0a0a', 850: '#111111',
+              800: '#181818', 750: '#1f1f1f', 700: '#262626'
             }
           },
           fontFamily: {
             mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
-            sans: ['Inter', 'system-ui', 'sans-serif']
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+          },
+          fontSize: {
+            'xs': ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
+            'sm': ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
+            'base': ['0.9375rem', { lineHeight: '1.55', letterSpacing: '0' }],
+            'lg': ['1.0625rem', { lineHeight: '1.5', letterSpacing: '-0.01em' }],
+            'xl': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.02em' }],
+            '2xl': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em' }],
+            '3xl': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em' }],
+          },
+          spacing: {
+            '18': '4.5rem',
+            '88': '22rem',
+          },
+          borderRadius: {
+            'xl': '0.875rem',
+            '2xl': '1.25rem',
+            '3xl': '1.75rem',
+          },
+          boxShadow: {
+            'glow': '0 0 40px -12px rgba(230,115,29,0.35)',
+            'glow-sm': '0 0 20px -8px rgba(230,115,29,0.25)',
+            'inner-glow': 'inset 0 0 30px rgba(230,115,29,0.05)',
+            'card': '0 4px 24px -4px rgba(0,0,0,0.4), 0 0 0 1px rgba(230,115,29,0.06)',
+            'card-hover': '0 12px 40px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,115,29,0.12)',
           },
           animation: {
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'spin-slow': 'spin 2s linear infinite',
-            'fade-in': 'fadeIn 0.3s ease-out',
-            'slide-up': 'slideUp 0.4s ease-out',
-            'slide-in-right': 'slideInRight 0.3s ease-out'
+            'pulse-slow': 'pulse 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 2.5s linear infinite',
+            'fade-in': 'fadeIn 0.25s ease-out',
+            'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+            'scale-in': 'scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            'shimmer': 'shimmer 2s ease-in-out infinite',
           },
           keyframes: {
             fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-            slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            slideInRight: { '0%': { opacity: '0', transform: 'translateX(10px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } }
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(8px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            slideInRight: { '0%': { opacity: '0', transform: 'translateX(8px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
+            scaleIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+          },
+          backgroundImage: {
+            'grid': 'linear-gradient(rgba(230,115,29,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(230,115,29,0.025) 1px, transparent 1px)',
+            'radial-glow': 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230,115,29,0.06) 0%, transparent 60%)',
+            'mesh': 'radial-gradient(ellipse at 20% 20%, rgba(230,115,29,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(14,199,125,0.05) 0%, transparent 50%)',
+          },
+          backgroundSize: {
+            'grid': '48px 48px',
           }
         }
       }
     }
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-funnel@3.0.0/dist/chartjs-chart-funnel.umd.min.js"></script>
@@ -57,61 +95,134 @@
   <style>
     * { font-family: 'Inter', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .bg-grid { background-image: linear-gradient(rgba(214,120,30,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(214,120,30,0.03) 1px, transparent 1px); background-size: 40px 40px; }
-    .bg-radial { background: radial-gradient(ellipse at 50% 0%, rgba(214,120,30,0.08) 0%, transparent 70%), #050505; }
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: #141414; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #3d3d3d; border-radius: 3px; }
-    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
-    .glass { background: rgba(28,28,28,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(214,120,30,0.1); }
-    .glass-hover:hover { border-color: rgba(214,120,30,0.3); box-shadow: 0 0 30px -10px rgba(214,120,30,0.15); }
-    .btn-primary { background: #c45f15; color: white; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; transition: all 0.2s; }
-    .btn-primary:hover { background: #d6781e; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    
+    .bg-grid { background-image: linear-gradient(rgba(230,115,29,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(230,115,29,0.025) 1px, transparent 1px); background-size: 48px 48px; }
+    .bg-mesh { background-image: radial-gradient(ellipse at 20% 20%, rgba(230,115,29,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(14,199,125,0.05) 0%, transparent 50%); }
+    .bg-radial { background: radial-gradient(ellipse at 50% 0%, rgba(230,115,29,0.06) 0%, transparent 60%), #030303; }
+    
+    .scrollbar-thin::-webkit-scrollbar { width: 5px; height: 5px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; border: 2px solid #0a0a0a; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #444; }
+    .scrollbar-thin::-webkit-scrollbar-corner { background: transparent; }
+    
+    .glass { background: rgba(24,24,24,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(230,115,29,0.08); }
+    .glass-strong { background: rgba(18,18,18,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(230,115,29,0.12); }
+    .glass-hover:hover { border-color: rgba(230,115,29,0.2); box-shadow: 0 0 30px -10px rgba(230,115,29,0.15); }
+    
+    .btn-primary { background: linear-gradient(135deg, #d45d14 0%, #e6731d 100%); color: white; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1.125rem; transition: all 0.15s ease; border: none; }
+    .btn-primary:hover { background: linear-gradient(135deg, #e6731d 0%, #ee954d 100%); box-shadow: 0 4px 20px -4px rgba(230,115,29,0.4); }
     .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary { background: #1c1c1c; color: #e5e5e5; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; border: 1px solid #374151; transition: all 0.2s; }
-    .btn-secondary:hover { background: #242424; }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #e6731d; }
+    
+    .btn-secondary { background: #181818; color: #e8e8e8; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1.125rem; border: 1px solid #2d2d2d; transition: all 0.15s ease; }
+    .btn-secondary:hover { background: #1f1f1f; border-color: #3a3a3a; }
     .btn-secondary:active { transform: scale(0.98); }
-    .btn-ghost { color: #9ca3af; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; transition: all 0.2s; }
-    .btn-ghost:hover { color: white; background: #1c1c1c; }
-    .input-base { width: 100%; background: #1c1c1c; border: 1px solid #374151; border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: white; transition: all 0.2s; }
+    .btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #3a3a3a; }
+    
+    .btn-ghost { color: #9ca3af; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1rem; transition: all 0.15s ease; }
+    .btn-ghost:hover { color: #fff; background: #181818; }
+    .btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #3a3a3a; }
+    
+    .btn-icon { width: 2.25rem; height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: all 0.15s ease; }
+    .btn-icon:hover { background: #1f1f1f; }
+    .btn-icon:active { transform: scale(0.92); }
+    
+    .input-base { width: 100%; background: #141414; border: 1px solid #2d2d2d; border-radius: 0.625rem; padding: 0.5625rem 0.875rem; color: #fff; transition: all 0.15s ease; font-size: 0.875rem; }
     .input-base::placeholder { color: #6b7280; }
-    .input-base:focus { outline: none; box-shadow: 0 0 0 2px #d6781e; border-color: transparent; }
-    .card-base { background: #141414; border: 1px solid #2d2d2d; border-radius: 0.75rem; padding: 1.25rem; }
-    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: white; }
-    .stat-label { font-size: 0.625rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-    .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 500; }
-    .badge-active { background: rgba(16,185,129,0.15); color: #10b981; }
-    .badge-inactive { background: #1f2937; color: #9ca3af; }
-    .badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .badge-danger { background: rgba(244,63,94,0.15); color: #f43f5e; }
-    .badge-info { background: rgba(14,165,233,0.15); color: #0ea5e9; }
-    .tab-btn { padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: #9ca3af; border-radius: 0.5rem; transition: all 0.2s; }
-    .tab-btn:hover { color: white; background: #1c1c1c; }
-    .tab-btn-active { color: #d6781e; background: rgba(56,21,7,0.5); border-bottom: 2px solid #d6781e; }
-    .table-header { padding: 0.75rem 1rem; font-size: 0.625rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(20,20,20,0.5); position: sticky; top: 0; }
-    .table-cell { padding: 0.75rem 1rem; font-size: 0.875rem; color: #d1d5db; border-top: 1px solid #2d2d2d; }
-    .table-row { transition: background 0.2s; cursor: pointer; }
-    .table-row:hover { background: rgba(28,28,28,0.5); }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .input-base:focus { outline: none; box-shadow: 0 0 0 2px #e6731d; border-color: transparent; }
+    .input-base:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .card-base { background: #0f0f0f; border: 1px solid #222; border-radius: 1rem; padding: 1.25rem; }
+    .card-elevated { background: #0f0f0f; border: 1px solid #222; border-radius: 1rem; box-shadow: 0 8px 32px -8px rgba(0,0,0,0.5); }
+    
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; color: #fff; line-height: 1.15; }
+    .stat-value-sm { font-family: 'JetBrains Mono', monospace; font-size: 1.375rem; font-weight: 600; color: #fff; line-height: 1.2; }
+    .stat-label { font-size: 0.625rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.375rem; font-weight: 500; }
+    
+    .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1875rem 0.625rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.02em; }
+    .badge-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; flex-shrink: 0; }
+    .badge-active { background: rgba(14,199,125,0.12); color: #0ec77d; }
+    .badge-active .badge-dot { background: #0ec77d; box-shadow: 0 0 8px #0ec77d; animation: pulse 2s ease-in-out infinite; }
+    .badge-inactive { background: #1f1f1f; color: #888; }
+    .badge-inactive .badge-dot { background: #444; }
+    .badge-warning { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .badge-warning .badge-dot { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; animation: pulse 1.5s ease-in-out infinite; }
+    .badge-danger { background: rgba(244,63,94,0.12); color: #f43f5e; }
+    .badge-danger .badge-dot { background: #f43f5e; }
+    .badge-info { background: rgba(14,165,233,0.12); color: #0ea5e9; }
+    .badge-info .badge-dot { background: #0ea5e9; }
+    
+    .tab-btn { padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 500; color: #71717a; border-radius: 0.5rem; transition: all 0.15s ease; position: relative; }
+    .tab-btn:hover { color: #fff; background: #181818; }
+    .tab-btn-active { color: #e6731d; background: rgba(57,21,7,0.4); }
+    .tab-btn-active::after { content: ''; position: absolute; bottom: -0.5rem; left: 50%; transform: translateX(-50%); width: 1.5rem; height: 2px; background: #e6731d; border-radius: 2px; }
+    
+    .table-header { padding: 0.625rem 0.875rem; font-size: 0.5625rem; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; background: rgba(15,15,15,0.6); position: sticky; top: 0; z-index: 1; }
+    .table-cell { padding: 0.625rem 0.875rem; font-size: 0.8125rem; color: #e8e8e8; border-top: 1px solid #1f1f1f; }
+    .table-row { transition: background 0.12s ease; cursor: pointer; }
+    .table-row:hover { background: rgba(30,30,30,0.6); }
+    .table-row-selected { background: rgba(230,115,29,0.06); }
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.2s ease-out; }
     .modal-overlay.open { display: flex; }
-    .modal-panel { background: #0d0d0d; border: 1px solid #374151; border-radius: 1rem; max-width: 48rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.4s ease-out; }
-    .chart-container { position: relative; height: 16rem; width: 100%; }
-    .chart-container-lg { position: relative; height: 20rem; width: 100%; }
-    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.125rem 0.375rem; background: #1c1c1c; border: 1px solid #374151; border-radius: 0.25rem; }
-    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; border-radius: 0.5rem; color: #9ca3af; transition: all 0.2s; }
-    .sidebar-link:hover { color: white; background: #1c1c1c; }
-    .sidebar-link-active { color: #d6781e; background: rgba(56,21,7,0.5); border-left: 2px solid #d6781e; }
-    .drop-zone { border: 2px dashed #374151; border-radius: 0.75rem; padding: 2rem; text-align: center; transition: all 0.2s; }
-    .drop-zone:hover { border-color: #d6781e; background: rgba(56,21,7,0.1); }
-    ::selection { background: rgba(214,120,30,0.3); color: white; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } }
-    .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
-    .animate-slide-up { animation: slideUp 0.4s ease-out; }
-    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    .modal-panel { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 1.25rem; max-width: 48rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 24px 64px -12px rgba(0,0,0,0.7); }
+    
+    .chart-container { position: relative; height: 14rem; width: 100%; }
+    .chart-container-lg { position: relative; height: 18rem; width: 100%; }
+    .chart-container-xl { position: relative; height: 22rem; width: 100%; }
+    
+    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.125rem 0.375rem; background: #141414; border: 1px solid #2d2d2d; border-radius: 0.25rem; color: #a1a1aa; }
+    
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5625rem 0.75rem; border-radius: 0.625rem; color: #71717a; transition: all 0.15s ease; font-size: 0.8125rem; font-weight: 500; }
+    .sidebar-link:hover { color: #fff; background: #181818; }
+    .sidebar-link-active { color: #e6731d; background: rgba(57,21,7,0.4); }
+    .sidebar-link-active::before { content: ''; width: 3px; height: 1.125rem; background: #e6731d; border-radius: 0 3px 3px 0; margin-right: -1px; }
+    
+    .toast { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 0.75rem; border: 1px solid; box-shadow: 0 12px 40px -8px rgba(0,0,0,0.5); animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1); min-width: 18rem; max-width: 26rem; }
+    .toast-icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; margin-top: 0.125rem; }
+    .toast-content { flex: 1; min-width: 0; }
+    .toast-title { font-weight: 600; font-size: 0.875rem; color: #fff; margin-bottom: 0.125rem; }
+    .toast-message { font-size: 0.8125rem; color: #a1a1aa; line-height: 1.4; }
+    .toast-close { color: #6b7280; transition: color 0.15s; flex-shrink: 0; }
+    .toast-close:hover { color: #fff; }
+    
+    .skeleton { background: linear-gradient(90deg, #181818 25%, #222 50%, #181818 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 0.375rem; }
+    
+    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.375rem; min-width: 12rem; background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 0.75rem; box-shadow: 0 16px 48px -12px rgba(0,0,0,0.6); padding: 0.375rem; z-index: 40; animation: scaleIn 0.15s ease-out; }
+    .dropdown-item { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: #d4d4d4; font-size: 0.8125rem; font-weight: 500; transition: all 0.12s; background: none; border: none; text-align: left; cursor: pointer; }
+    .dropdown-item:hover { background: #181818; color: #fff; }
+    .dropdown-item.danger:hover { background: rgba(244,63,94,0.1); color: #f43f5e; }
+    .dropdown-divider { height: 1px; background: #222; margin: 0.375rem 0; }
+    
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring-bg { fill: none; stroke: #222; stroke-width: 3; }
+    .progress-ring-fill { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    
+    .avatar { width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; }
+    .avatar-sm { width: 1.75rem; height: 1.75rem; font-size: 0.6875rem; }
+    .avatar-lg { width: 3rem; height: 3rem; font-size: 1rem; }
+    
+    .tooltip { position: relative; }
+    .tooltip::before { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0.375rem; padding: 0.375rem 0.625rem; background: #111; border: 1px solid #2a2a2a; border-radius: 0.375rem; font-size: 0.6875rem; color: #d4d4d4; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.15s; z-index: 30; }
+    .tooltip::after { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0; border: 5px solid transparent; border-top-color: #2a2a2a; opacity: 0; visibility: hidden; transition: all 0.15s; }
+    .tooltip:hover::before, .tooltip:hover::after { opacity: 1; visibility: visible; }
+    
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    
+    .focus-ring:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #e6731d; }
+    
+    .text-gradient { background: linear-gradient(135deg, #e6731d 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .text-gradient-emerald { background: linear-gradient(135deg, #0ec77d 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .text-gradient-violet { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    
+    .divider-vertical { width: 1px; background: linear-gradient(to bottom, transparent, #2a2a2a, transparent); }
+    .divider-horizontal { height: 1px; background: linear-gradient(to right, transparent, #2a2a2a, transparent); }
   </style>
 </head>
-<body class="bg-surface-950 text-gray-100 min-h-screen bg-radial bg-grid">
+<body class="bg-surface-950 text-gray-100 min-h-screen bg-mesh bg-radial bg-grid antialiased">
   <script>
     window.__CHAOS_CONFIG__ = {
       apiBase: '/api',
@@ -119,75 +230,83 @@
     };
   </script>
 
-  <div class="flex min-h-screen">
+  <div class="flex min-h-screen" id="app">
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-surface-900 border-r border-gray-800 flex flex-col transform transition-transform duration-300 lg:translate-x-0 -translate-x-full">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-surface-900/95 backdrop-blur-xl border-r border-gray-800/50 flex flex-col transform transition-transform duration-300 ease-out lg:translate-x-0 -translate-x-full" aria-label="Main navigation">
       <div class="flex flex-col h-full">
-        <!-- Logo -->
-        <div class="p-5 border-b border-gray-800 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-chaos-500 to-chaos-700 flex items-center justify-center relative overflow-hidden">
-            <svg class="w-6 h-6 text-surface-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        <!-- Brand -->
+        <div class="p-4 border-b border-gray-800/50 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-chaos-500 to-chaos-600 flex items-center justify-center relative overflow-hidden shadow-lg shadow-chaos-500/25">
+            <svg class="w-5 h-5 text-surface-950" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
             </svg>
-            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent"></div>
           </div>
           <div>
-            <h1 class="font-bold text-white text-lg">Chaos C2</h1>
-            <p class="text-xs text-gray-500 font-mono">v2.4.1 • Live</p>
+            <h1 class="font-display font-bold text-white text-base">Chaos C2</h1>
+            <p class="text-[0.625rem] text-gray-500 font-mono tracking-wide">v2.4.1</p>
           </div>
         </div>
 
         <!-- Campaign Selector -->
-        <div class="p-4 border-b border-gray-800">
-          <label class="block text-xs text-gray-500 uppercase tracking-wider mb-2">Active Campaign</label>
-          <select id="campaignSelect" class="input-base" onchange="switchCampaign(this.value)">
-            <option value="">Select campaign...</option>
-          </select>
-          <button class="btn-secondary w-full mt-2 text-xs" onclick="openCampaignModal()">+ New Campaign</button>
+        <div class="p-4 border-b border-gray-800/50">
+          <label class="block text-[0.5625rem] text-gray-500 uppercase tracking-widest mb-2">Active Campaign</label>
+          <div class="relative">
+            <select id="campaignSelect" class="input-base appearance-none pr-8" onchange="switchCampaign(this.value)">
+              <option value="">Select campaign…</option>
+            </select>
+            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <button class="btn-secondary w-full mt-2 text-xs flex items-center justify-center gap-1.5" onclick="openCampaignModal()">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            <span>New Campaign</span>
+          </button>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
-          <a href="#" class="sidebar-link sidebar-link-active" data-view="overview" onclick="showView('overview'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        <nav class="flex-1 p-3 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
+          <a href="#" class="sidebar-link sidebar-link-active" data-view="overview" onclick="showView('overview'); return false;" aria-current="page">
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             <span>Overview</span>
-            <span id="overviewBadge" class="ml-auto badge badge-active hidden">Live</span>
+            <span id="overviewBadge" class="ml-auto badge badge-active hidden"><span class="badge-dot"></span>Live</span>
           </a>
           <a href="#" class="sidebar-link" data-view="systems" onclick="showView('systems'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            <span>Affected Systems</span>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><path d="M3 17h18"/></svg>
+            <span>Systems</span>
             <span id="systemsBadge" class="ml-auto badge badge-info hidden">0</span>
           </a>
           <a href="#" class="sidebar-link" data-view="campaigns" onclick="showView('campaigns'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            <span>Campaigns & Keys</span>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Campaigns</span>
             <span id="campaignsBadge" class="ml-auto badge hidden">0</span>
           </a>
           <a href="#" class="sidebar-link" data-view="analytics" onclick="showView('analytics'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span>Analytics</span>
           </a>
           <a href="#" class="sidebar-link" data-view="geo" onclick="showView('geo'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"></circle></svg>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 21.7a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/></svg>
             <span>Geographic</span>
           </a>
           <a href="#" class="sidebar-link" data-view="timeline" onclick="showView('timeline'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>Timeline</span>
           </a>
           <a href="#" class="sidebar-link" data-view="files" onclick="showView('files'); return false;">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-            <span>File Explorer</span>
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Files</span>
           </a>
         </nav>
 
         <!-- Connection Status -->
-        <div class="p-4 border-t border-gray-800">
+        <div class="p-3 border-t border-gray-800/50">
           <div class="flex items-center gap-3">
-            <div id="connIndicator" class="w-2.5 h-2.5 rounded-full bg-gray-600"></div>
-            <div class="flex-1">
-              <p class="text-xs font-medium text-gray-300">Connection</p>
-              <p id="connStatus" class="text-xs text-gray-500">Disconnected</p>
+            <div id="connIndicator" class="w-2 h-2 rounded-full bg-gray-600 transition-colors"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[0.625rem] font-medium text-gray-300 truncate">Connection</p>
+              <p id="connStatus" class="text-[0.625rem] text-gray-500 truncate">Disconnected</p>
             </div>
           </div>
         </div>
@@ -195,69 +314,104 @@
     </aside>
 
     <!-- Sidebar Overlay (Mobile) -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()" aria-hidden="true"></div>
 
     <!-- Main Content -->
-    <main class="flex-1 lg:ml-72 min-h-screen flex flex-col">
+    <main class="flex-1 lg:ml-64 min-h-screen flex flex-col" id="mainContent">
       <!-- Top Bar -->
-      <header class="bg-surface-900/80 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-20">
-        <div class="flex items-center justify-between h-16 px-4 sm:px-6">
-          <div class="flex items-center gap-4">
-            <button class="lg:hidden p-2 rounded-lg hover:bg-surface-800" onclick="toggleSidebar()">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <header class="bg-surface-900/80 backdrop-blur-xl border-b border-gray-800/50 sticky top-0 z-20">
+        <div class="flex items-center justify-between h-14 px-4 sm:px-5">
+          <div class="flex items-center gap-3">
+            <button class="lg:hidden btn-icon" onclick="toggleSidebar()" aria-label="Toggle navigation">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <h2 id="viewTitle" class="text-lg font-semibold text-white hidden sm:block">Overview</h2>
+            <h2 id="viewTitle" class="font-display font-semibold text-white text-lg hidden sm:block">Overview</h2>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2.5">
             <!-- Theme Selector -->
-            <select id="themeSelect" class="input-base w-auto py-1.5 text-sm" onchange="EnhancedUI.themes.applyTheme(this.value)">
-              <option value="chaos">Chaos Amber</option>
-              <option value="matrix">Matrix Green</option>
-              <option value="midnight">Midnight Blue</option>
-              <option value="blood">Blood Red</option>
-              <option value="mono">Monochrome</option>
-            </select>
+            <div class="relative hidden sm:block">
+              <select id="themeSelect" class="input-base appearance-none pr-8 w-auto py-1.5 text-sm" onchange="EnhancedUI.themes.applyTheme(this.value)">
+                <option value="chaos">Chaos</option>
+                <option value="matrix">Matrix</option>
+                <option value="midnight">Midnight</option>
+                <option value="blood">Blood</option>
+                <option value="mono">Mono</option>
+              </select>
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </div>
 
             <!-- Time Range -->
-            <select id="timeRange" class="input-base w-auto py-1.5 text-sm" onchange="refreshView()">
-              <option value="1h">Last Hour</option>
-              <option value="6h">6 Hours</option>
-              <option value="24h" selected>24 Hours</option>
-              <option value="7d">7 Days</option>
-              <option value="30d">30 Days</option>
+            <select id="timeRange" class="input-base w-auto py-1.5 text-sm hidden md:block" onchange="refreshView()">
+              <option value="1h">1h</option>
+              <option value="6h">6h</option>
+              <option value="24h" selected>24h</option>
+              <option value="7d">7d</option>
+              <option value="30d">30d</option>
             </select>
 
             <!-- Refresh Button -->
-            <button id="refreshBtn" class="btn-secondary" onclick="refreshView()">
-              <svg class="w-4 h-4 mr-1" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <button id="refreshBtn" class="btn-secondary hidden sm:flex" onclick="refreshView()" aria-label="Refresh data">
+              <svg class="w-4 h-4" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               <span class="hidden sm:inline">Refresh</span>
             </button>
 
             <!-- Auth/User -->
-            <div class="flex items-center gap-3">
-              <button id="authBtn" class="btn-ghost text-xs" onclick="openAuthModal()">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <div class="flex items-center gap-2">
+              <button id="authBtn" class="btn-ghost text-xs hidden sm:flex" onclick="openAuthModal()">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 <span id="authStatus">Sign In</span>
               </button>
+              
+              <!-- User Menu (when logged in) -->
+              <div id="userMenu" class="hidden relative">
+                <button class="btn-icon relative" onclick="toggleUserMenu()" aria-label="User menu" aria-expanded="false">
+                  <div id="userAvatar" class="avatar bg-gradient-to-br from-chaos-500 to-chaos-600 text-surface-950">U</div>
+                </button>
+                <div id="userDropdown" class="dropdown-menu hidden">
+                  <div class="px-3 py-2 border-b border-gray-800">
+                    <p class="text-xs font-medium text-white" id="userName">User</p>
+                    <p class="text-[0.5625rem] text-gray-500 font-mono" id="userRole">Role</p>
+                  </div>
+                  <button class="dropdown-item" onclick="openCampaignModal()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    New Campaign
+                  </button>
+                  <button class="dropdown-item" onclick="showView('campaigns')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    Campaigns
+                  </button>
+                  <button class="dropdown-item" onclick="showView('systems')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Systems
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item danger" onclick="signOut()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sign Out
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       <!-- View Tabs (Mobile) -->
-      <div class="lg:hidden overflow-x-auto px-3 py-2 border-b border-gray-800" id="mobileTabs">
-        <button class="tab-btn tab-btn-active whitespace-nowrap" data-view="overview" onclick="showView('overview')">Overview</button>
-        <button class="tab-btn whitespace-nowrap" data-view="systems" onclick="showView('systems')">Systems</button>
-        <button class="tab-btn whitespace-nowrap" data-view="campaigns" onclick="showView('campaigns')">Campaigns</button>
-        <button class="tab-btn whitespace-nowrap" data-view="analytics" onclick="showView('analytics')">Analytics</button>
-        <button class="tab-btn whitespace-nowrap" data-view="geo" onclick="showView('geo')">Geo</button>
-        <button class="tab-btn whitespace-nowrap" data-view="timeline" onclick="showView('timeline')">Timeline</button>
-        <button class="tab-btn whitespace-nowrap" data-view="files" onclick="showView('files')">Files</button>
+      <div class="lg:hidden overflow-x-auto px-3 py-2 border-b border-gray-800/50 scrollbar-thin" id="mobileTabs" role="tablist">
+        <button class="tab-btn tab-btn-active whitespace-nowrap" data-view="overview" onclick="showView('overview')" role="tab" aria-selected="true">Overview</button>
+        <button class="tab-btn whitespace-nowrap" data-view="systems" onclick="showView('systems')" role="tab" aria-selected="false">Systems</button>
+        <button class="tab-btn whitespace-nowrap" data-view="campaigns" onclick="showView('campaigns')" role="tab" aria-selected="false">Campaigns</button>
+        <button class="tab-btn whitespace-nowrap" data-view="analytics" onclick="showView('analytics')" role="tab" aria-selected="false">Analytics</button>
+        <button class="tab-btn whitespace-nowrap" data-view="geo" onclick="showView('geo')" role="tab" aria-selected="false">Geo</button>
+        <button class="tab-btn whitespace-nowrap" data-view="timeline" onclick="showView('timeline')" role="tab" aria-selected="false">Timeline</button>
+        <button class="tab-btn whitespace-nowrap" data-view="files" onclick="showView('files')" role="tab" aria-selected="false">Files</button>
       </div>
 
       <!-- View Content -->
-      <div class="flex-1 overflow-auto p-4 sm:p-6" id="viewContent">
+      <div class="flex-1 overflow-auto p-4 sm:p-5" id="viewContent">
         <!-- Views rendered dynamically -->
       </div>
     </main>
@@ -267,24 +421,28 @@
   <div id="modalRoot"></div>
 
   <!-- Toast Container -->
-  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- Chart.js Default Config -->
   <script>
-    Chart.defaults.color = '#9ca3af';
+    Chart.defaults.color = '#71717a';
     Chart.defaults.font.family = 'Inter';
-    Chart.defaults.borderColor = '#2d2d2d';
+    Chart.defaults.borderColor = '#262626';
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.padding = 20;
-    Chart.defaults.plugins.tooltip.backgroundColor = '#1c1c1c';
-    Chart.defaults.plugins.tooltip.borderColor = '#2d2d2d';
+    Chart.defaults.plugins.legend.labels.padding = 16;
+    Chart.defaults.plugins.legend.labels.font.size = 11;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#111';
+    Chart.defaults.plugins.tooltip.borderColor = '#2a2a2a';
     Chart.defaults.plugins.tooltip.borderWidth = 1;
-    Chart.defaults.plugins.tooltip.padding = 12;
-    Chart.defaults.plugins.tooltip.titleFont.size = 13;
-    Chart.defaults.plugins.tooltip.bodyFont.size = 12;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.titleFont.size = 12;
+    Chart.defaults.plugins.tooltip.bodyFont.size = 11;
     Chart.defaults.plugins.tooltip.bodyFont.family = 'JetBrains Mono';
-    Chart.defaults.scales.x.grid.color = '#2d2d2d';
-    Chart.defaults.scales.y.grid.color = '#2d2d2d';
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.scales.x.grid.color = '#222';
+    Chart.defaults.scales.y.grid.color = '#222';
+    Chart.defaults.interaction.mode = 'index';
+    Chart.defaults.interaction.intersect = false;
   </script>
 
   <!-- Main App Script -->
