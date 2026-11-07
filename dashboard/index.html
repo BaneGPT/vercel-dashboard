@@ -52,6 +52,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-funnel@3.0.0/dist/chartjs-chart-funnel.umd.min.js"></script>
+  <script src="/enhanced-ui.js"></script>
   <style>
     * { font-family: 'Inter', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -208,6 +210,15 @@
           </div>
 
           <div class="flex items-center gap-3">
+            <!-- Theme Selector -->
+            <select id="themeSelect" class="input-base w-auto py-1.5 text-sm" onchange="EnhancedUI.themes.applyTheme(this.value)">
+              <option value="chaos">Chaos Amber</option>
+              <option value="matrix">Matrix Green</option>
+              <option value="midnight">Midnight Blue</option>
+              <option value="blood">Blood Red</option>
+              <option value="mono">Monochrome</option>
+            </select>
+
             <!-- Time Range -->
             <select id="timeRange" class="input-base w-auto py-1.5 text-sm" onchange="refreshView()">
               <option value="1h">Last Hour</option>
