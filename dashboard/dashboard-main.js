@@ -23,87 +23,14 @@ const theme = {
   transitions: { fast: '150ms ease', normal: '250ms ease', slow: '350ms ease' },
 };
 
-function formatNumber(n) { return (n ?? 0).toLocaleString(); }
-function formatCurrency(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0); }
-function formatCompact(n) { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); }
-function cn(...classes) { return classes.filter(Boolean).join(' '); }
-
-// ============================================
-// ICONS
-// ============================================
-const Icons = {
-  dashboard: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
-  server: '<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
-  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  rocket: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5z"/><path d="M14.5 7.5c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5z"/><line x1="12" y1="19" x2="12" y2="22"/>',
-  chart: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
-  bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
-  menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
-  chevronDown: '<polyline points="6 9 12 15 18 9"/>',
-  bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
-  user: '<circle cx="12" cy="8" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
-  chevronDown2: '<polyline points="6 9 12 15 18 9"/>',
-  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 1 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 1 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 1 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 1 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 1-1.51 1z"/>',
-  refresh: '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>',
-  bell2: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
-  chevronDown2: '<polyline points="6 9 12 15 18 9"/>',
-  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
-  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
-  wallet: '<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-6"/><path d="M3 19a2 2 0 0 0 2 2h16"/>',
-  target2: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  shield2: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  users2: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  rocket2: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5z"/><path d="M14.5 7.5c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5z"/><line x1="12" y1="19" x2="12" y2="22"/>',
-  lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
-  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  check: '<polyline points="20 6 9 17 4 12"/>',
-  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
-  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-};
-
-function createIcon(name, size = 20) {
-  const svg = Icons[name] || Icons.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>`;
-}
-
 // ============================================
 // UTILITIES
 // ============================================
-const $ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
-const $$ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return Array.from(t.content.children); };
 const formatNumber = (n) => (n ?? 0).toLocaleString();
 const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
 const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
-
-// ============================================
-// SVG ICON HELPER
-// ============================================
-function icon(name, size = 20) {
-  const paths = {
-    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
-    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
-    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    chart: 'M18 20V10M12 20V4M6 20v-6',
-    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
-    menu: 'M3 12h18M3 6h18M3 18h18',
-    chevronDown: 'M6 9l6 6 6-6',
-    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x: 'M18 6L6 18M6 6l12 12',
-    check: 'M20 6L9 17l-5-5',
-    plus: 'M12 5v14M5 12h14',
-    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-  };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
-}
+const timeAgo = (iso) => { if (!iso) return '—'; const d = Date.now() - new Date(iso).getTime(); const m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000); if (m < 1) return 'Just now'; if (m < 60) return m+'m ago'; if (h < 24) return h+'h ago'; return dy+'d ago'; };
+const cn = (...c) => c.filter(Boolean).join(' ');
 
 // ============================================
 // COMPONENT FACTORY
@@ -112,53 +39,46 @@ const $ = (html) => { const t = document.createElement('template'); t.innerHTML 
 const $$ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return Array.from(t.content.children); };
 
 // ============================================
-// UTILITIES
+// ICON PATHS
 // ============================================
-const formatNumber = (n) => (n ?? 0).toLocaleString();
-const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
-const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
-const timeAgo = (iso) => { if (!iso) return '—'; const d = Date.now() - new Date(iso).getTime(); const m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000); if (m < 1) return 'Just now'; if (m < 60) return m+'m ago'; if (h < 24) return h+'h ago'; return dy+'d ago'; };
+const IconPaths = {
+  dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
+  server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
+  rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  chart: 'M18 20V10M12 20V4M6 20v-6',
+  bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
+  menu: 'M3 12h18M3 6h18M3 18h18',
+  chevronDown: 'M6 9l6 6 6-6',
+  target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
+  x: 'M18 6L6 18M6 6l12 12',
+  check: 'M20 6L9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
+  activity: 'M22 12H18M15 21V12M9 3v9M6 12H2',
+  wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16',
+  download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
+  activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2',
+  shield3: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  target2: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
+  shield4: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  users2: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  rocket2c: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  lock2: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
+  x2: 'M18 6L6 18M6 6l12 12',
+  check2: 'M20 6L9 17l-5-5',
+  plus2: 'M12 5v14M5 12h14',
+  search2: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
+};
 
-// ============================================
-// ICON HELPER
-// ============================================
 function ic(name, size = 20) {
-  const paths = {
-    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
-    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
-    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    chart: 'M18 20V10M12 20V4M6 20v-6',
-    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
-    menu: 'M3 12h18M3 6h18M3 18h18',
-    chevronDown: 'M6 9l6 6 6-6',
-    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x: 'M18 6L6 18M6 6l12 12',
-    check: 'M20 6L9 17l-5-5',
-    plus: 'M12 5v14M5 12h14',
-    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-    activity: 'M22 12H18M15 21V12M9 3v9M6 12H2',
-    wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16',
-    download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
-    activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2',
-    shield3: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    target2: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield4: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users2: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2c: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    lock2: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x2: 'M18 6L6 18M6 6l12 12',
-    check2: 'M20 6L9 17l-5-5',
-    plus2: 'M12 5v14M5 12h14',
-    search2: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-  };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+  const path = IconPaths[name] || IconPaths.dashboard;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IconPaths[name] || IconPaths.dashboard}"/></svg>`;
 }
 
 // ============================================
@@ -371,68 +291,6 @@ function ic(name, size = 20) {
     chevronDown: 'M6 9l6 6 6-6',
     target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
     shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5 3.74 2 5zM12 19v3',
-    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x: 'M18 6L6 18M6 6l12 12',
-    check: 'M20 6L9 17l-5-5',
-    plus: 'M12 5v14M5 12h14',
-    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-  };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
-}
-
-// ============================================
-// UTILITIES
-// ============================================
-const formatNumber = (n) => (n ?? 0).toLocaleString();
-const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
-const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
-const timeAgo = (iso) => { if (!iso) return '—'; const d = Date.now() - new Date(iso).getTime(); const m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000); if (m < 1) return 'Just now'; if (m < 60) return m+'m ago'; if (h < 24) return h+'h ago'; return dy+'d ago'; };
-
-// ============================================
-// STATE
-// ============================================
-const state = {
-  currentView: 'dashboard',
-  sidebarOpen: false,
-  user: { name: 'Operator', role: 'Administrator', avatar: 'OP' },
-  sseClient: null,
-  charts: {},
-  data: {
-    stats: {
-      activeCampaigns: 12, totalInfections: 147328, totalExfiltrated: 487.3, activeSessions: 342,
-      revenue24h: 47200, conversionRate: 2.3, avgRansom: 47200, threatLevel: 'HIGH'
-    },
-    campaigns: [],
-    systems: [],
-    recentActivity: [],
-    charts: {
-      infections24h: { labels: [], data: [] },
-      revenue7d: { labels: [], data: [] },
-      geoDistribution: { labels: [], data: [] },
-      ransomDistribution: { labels: [], data: [] }
-    }
-  }
-};
-
-// ============================================
-// ICON HELPER
-// ============================================
-function ic(name, size = 20) {
-  const paths = {
-    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
-    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
-    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
-    chart: 'M18 20V10M12 20V4M6 20v-6',
-    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
-    menu: 'M3 12h18M3 6h18M3 18h18',
-    chevronDown: 'M6 9l6 6 6-6',
-    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
     rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
     shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
     users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
@@ -442,16 +300,46 @@ function ic(name, size = 20) {
     check: 'M20 6L9 17l-5-5',
     plus: 'M12 5v14M5 12h14',
     search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-    activity: 'M22 12H18M15 21V12M9 3v9M6 12H2',
-    wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16',
-    download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
   };
   const path = paths[name] || paths.dashboard;
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
 }
 
 // ============================================
-// COMPONENT BUILDERS
+// CSS INJECTION
+// ============================================
+document.getElementById('design-system-styles').textContent = STYLES;
+
+// ============================================
+// ICON HELPER
+// ============================================
+function ic(name, size = 20) {
+  const paths = {
+    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
+    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
+    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
+    chart: 'M18 20V10M12 20V4M6 20v-6',
+    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
+    menu: 'M3 12h18M3 6h18M3 18h18',
+    chevronDown: 'M6 9l6 6 6-6',
+    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
+    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
+    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
+    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
+    x: 'M18 6L6 18M6 6l12 12',
+    check: 'M20 6L9 17l-5-5',
+    plus: 'M12 5v14M5 12h14',
+    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
+  };
+  const path = paths[name] || paths.dashboard;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+}
+
+// ============================================
+// COMPONENT HELPERS
 // ============================================
 function StatCard({ label, value, trend, icon, color = 'primary' }) {
   const colors = { primary: '#d6781e', success: '#10b981', warning: '#f59e0b', danger: '#f43f5e', info: '#0ea5e9', violet: '#8b5cf6' };
@@ -484,22 +372,6 @@ function ChartCard({ title, subtitle, canvasId, height = 300 }) {
   `;
 }
 
-function SidebarLink({ id, icon, label, active, badge }) {
-  return `<a href="#" class="sidebar-link ${active ? 'sidebar-link-active' : ''}" onclick="navigate('${id}');return false;">${ic(icon, 20)}<span>${label}</span>${badge ? `<span class="badge badge-info">${badge}</span>` : ''}</a>`;
-}
-
-// ============================================
-// CHART DEFAULTS
-// ============================================
-const chartDefaults = {
-  responsive: true, maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1c1c1c', borderColor: '#2d2d2d', borderWidth: 1, padding: 12, titleFont: { size: 13 }, bodyFont: { size: 12, family: 'JetBrains Mono' } } },
-  scales: { x: { grid: { color: '#2d2d2d', drawBorder: false }, ticks: { color: '#6b7280', maxTicksLimit: 8 } }, y: { grid: { color: '#2d2d2d', drawBorder: false }, ticks: { color: '#6b7280', callback: v => v >= 1000 ? (v/1000).toFixed(1)+'k' : v } } },
-  interaction: { mode: 'index', intersect: false },
-};
-
-function gradient(ctx, color) { const grad = ctx.createLinearGradient(0,0,0,300); grad.addColorStop(0, color+'40'); grad.addColorStop(1, color+'00'); return grad; }
-
 // ============================================
 // STATE
 // ============================================
@@ -510,8 +382,19 @@ const state = {
   sseClient: null,
   charts: {},
   data: {
-    stats: { activeCampaigns: 12, totalInfections: 147328, totalExfiltrated: 487.3, activeSessions: 342, revenue24h: 47200, conversionRate: 2.3, avgRansom: 47200, threatLevel: 'HIGH' },
-    campaigns: [], systems: [], recentActivity: [],
+    stats: {
+      activeCampaigns: 12, totalInfections: 147328, totalExfiltrated: 487.3, activeSessions: 342,
+      revenue24h: 47200, conversionRate: 2.3, avgRansom: 47200, threatLevel: 'HIGH'
+    },
+    campaigns: [],
+    systems: [],
+    recentActivity: [],
+    charts: {
+      infections24h: { labels: [], data: [] },
+      revenue7d: { labels: [], data: [] },
+      geoDistribution: { labels: [], data: [] },
+      ransomDistribution: { labels: [], data: [] }
+    }
   }
 };
 
@@ -546,28 +429,9 @@ class SSEClient {
 // ============================================
 // RENDER FUNCTIONS
 // ============================================
-function ic(name, size = 20) {
-  const paths = { dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z', server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01', rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3', chart: 'M18 20V10M12 20V4M6 20v-6', bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0', menu: 'M3 12h18M3 6h18M3 18h18', chevronDown: 'M6 9l6 6 6-6', target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z', shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3', shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4', x: 'M18 6L6 18M6 6l12 12', check: 'M20 6L9 17l-5-5', plus: 'M12 5v14M5 12h14', search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z', activity: 'M22 12H18M15 21V12M9 3v9M6 12H2', wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16', download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3', activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2' };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
-}
-
-function formatNumber(n) { return (n ?? 0).toLocaleString(); }
-const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
-const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
-
-function ic(name, size = 20) {
-  const paths = { dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z', server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01', rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3', chart: 'M18 20V10M12 20V4M6 20v-6', bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0', menu: 'M3 12h18M3 6h18M3 18h18', chevronDown: 'M6 9l6 6 6-6', target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z', shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3', shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4', x: 'M18 6L6 18M6 6l12 12', check: 'M20 6L9 17l-5-5', plus: 'M12 5v14M5 12h14', search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z', activity: 'M22 12H18M15 21V12M9 3v9M6 12H2', wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16', download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3', activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2' };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
-}
-
-// ============================================
-// RENDER FUNCTIONS
-// ============================================
 function renderApp() {
   document.getElementById('app').innerHTML = `
-    <style>${STYLES}</style>
+    <style id="design-system-styles">${STYLES}</style>
     <div class="app-layout">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -616,27 +480,6 @@ function renderSidebar() {
   `).join('');
 }
 
-function StatCard({ label, value, trend, icon, color = 'primary' }) {
-  const colors = { primary: '#d6781e', success: '#10b981', warning: '#f59e0b', danger: '#f43f5e', info: '#0ea5e9', violet: '#8b5cf6' };
-  const clr = colors[color] || colors.primary;
-  return `
-    <div class="card stat-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <p style="font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.05em;color:#9ca3af;">${label}</p>
-          <p style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;margin-top:4px;">${value}</p>
-          ${trend ? `<p style="font-size:0.8125rem;margin-top:8px;display:flex;align-items:center;gap:4px;color:${trend.up ? '#10b981' : '#f43f5e'};"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> ${trend.value}</p>` : ''}
-        </div>
-        <div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${colors[color]},${colors[color]});">${ic(icon, 24)}</div>
-      </div>
-    </div>
-  `;
-}
-
-function ChartCard({ title, subtitle, canvasId, height = 300 }) {
-  return `<div class="card card-elevated"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;"><div><h3 style="font-size:1.0625rem;font-weight:600;">${title}</h3>${subtitle ? `<p style="font-size:0.8125rem;color:#9ca3af;">${subtitle}</p>` : ''}</div></div><div style="position:relative;width:100%;height:${height}px;"><canvas id="${canvasId}"></canvas></div></div>`;
-}
-
 function renderDashboard() {
   const s = state.data.stats;
   return `
@@ -673,8 +516,6 @@ function renderNegotiations() { return `<div class="fade-in"><div style="display
 function renderAnalytics() { return `<div class="fade-in"><h2 style="font-size:1.5rem;font-weight:700;margin-bottom:24px;">Analytics</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">${ChartCard({ title: 'Infection Timeline', subtitle: '30-day infection trend', canvasId: 'timeline-chart', height: 350 })}${ChartCard({ title: 'OS Distribution', subtitle: 'Operating system breakdown', canvasId: 'os-chart', height: 350 })}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">${ChartCard({ title: 'Encryption Types', subtitle: 'Algorithm distribution', canvasId: 'encryption-chart', height: 350 })}${ChartCard({ title: 'Payment Methods', subtitle: 'Crypto payment preferences', canvasId: 'payment-chart', height: 350 })}</div></div>`; }
 function renderSettings() { return `<div style="max-width:800px;"><h2 style="font-size:1.5rem;font-weight:700;margin-bottom:24px;">Settings</h2><div class="card"><h3 style="font-size:1.0625rem;font-weight:600;margin-bottom:20px;">Profile</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><label style="font-size:0.75rem;color:#9ca3af;">Name</label><input class="input" style="margin-top:4px;" value="${state.user.name}"></div><div><label style="font-size:0.75rem;color:#9ca3af;">Role</label><input class="input" style="margin-top:4px;" value="${state.user.role}" disabled></div><div><label style="font-size:0.75rem;color:#9ca3af;">Email</label><input class="input" style="margin-top:4px;" type="email" placeholder="operator@chaosc2.local"></div><div><label style="font-size:0.75rem;color:#9ca3af;">API Key</label><div style="display:flex;gap:8px;"><input class="input" style="flex:1;" value="ck_live_..." disabled><button class="btn btn-secondary btn-sm">Regenerate</button></div></div></div></div><div class="card" style="margin-top:24px;"><h3 style="font-size:1.0625rem;font-weight:600;margin-bottom:20px;">Security</h3><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #2d2d2d;"><div><p style="font-weight:500;">Two-Factor Authentication</p><p style="font-size:0.8125rem;color:#9ca3af;">Add an extra layer of security</p></div><label style="position:relative;width:48px;height:28px;"><input type="checkbox" checked style="opacity:0;width:0;height:0;"><span style="position:absolute;inset:0;background:#2d2d2d;border-radius:28px;transition:250ms ease;cursor:pointer;"></span></label></div><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #2d2d2d;"><div><p style="font-weight:500;">Session Timeout</p><p style="font-size:0.8125rem;color:#9ca3af;">Auto-logout after inactivity</p></div><select class="input" style="width:auto;"><option>30 minutes</option><option selected>1 hour</option><option>4 hours</option><option>24 hours</option></select></div><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;"><div><p style="font-weight:500;">API Access Logs</p><p style="font-size:0.8125rem;color:#9ca3af;">Log all API requests</p></div><label style="position:relative;width:48px;height:28px;"><input type="checkbox" style="opacity:0;width:0;height:0;"><span style="position:absolute;inset:0;background:#2d2d2d;border-radius:28px;transition:250ms ease;cursor:pointer;"></span></label></div></div><div class="card" style="margin-top:24px;border-color:#f43f5e;"><h3 style="font-size:1.0625rem;font-weight:600;margin-bottom:20px;color:#f43f5e;">Danger Zone</h3><button class="btn btn-danger">Delete Account</button><p style="font-size:0.8125rem;color:#9ca3af;margin-top:12px;">This action is irreversible. All data will be permanently deleted.</p></div></div>`; }
 
-function renderActivity() { return ''; }
-
 // ============================================
 // CHART INITIALIZATION
 // ============================================
@@ -684,7 +525,7 @@ function gradient(ctx, color) { const grad = ctx.createLinearGradient(0,0,0,300)
 function initCharts() {
   const c = chartColors;
   // Infections
-  new Chart(document.getElementById('infections-chart'), { ...{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1c1c1c', borderColor: '#2d2d2d', borderWidth: 1, padding: 12, titleFont: { size: 13 }, bodyFont: { size: 12, family: 'JetBrains Mono' } } }, scales: { x: { grid: { color: '#2d2d2d', drawBorder: false }, ticks: { color: '#6b7280', maxTicksLimit: 8 } }, y: { grid: { color: '#2d2d2d', drawBorder: false }, ticks: { color: '#6b7280', callback: v => v >= 1000 ? (v/1000).toFixed(1)+'k' : v } } }, interaction: { mode: 'index', intersect: false } }, type: 'line', data: { labels: Array.from({length: 24}, (_, i) => i+':00'), datasets: [{ label: 'Infections', data: Array.from({length: 24}, () => Math.floor(Math.random()*500)+100), borderColor: '#d6781e', backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,300); g.addColorStop(0, '#d6781e40'); g.addColorStop(1, '#d6781e00'); return g; }, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6 }] } });
+  new Chart(document.getElementById('infections-chart'), { type: 'line', data: { labels: Array.from({length: 24}, (_, i) => i+':00'), datasets: [{ label: 'Infections', data: Array.from({length: 24}, () => Math.floor(Math.random()*500)+100), borderColor: '#d6781e', backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,300); g.addColorStop(0, '#d6781e40'); g.addColorStop(1, '#d6781e00'); return g; }, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6 }] } });
   // Revenue
   new Chart(document.getElementById('revenue-chart'), { type: 'bar', data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Revenue', data: [42000,38000,45000,52000,61000,48000,47200], backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,300); g.addColorStop(0, '#10b98140'); g.addColorStop(1, '#10b98100'); return g; }, borderColor: '#10b981', borderWidth: 1, borderRadius: 8 }] } });
   // Geo
@@ -763,7 +604,6 @@ function renderStats() {
 // ============================================
 function init() {
   renderApp();
-  renderSidebar();
   renderSidebar();
   navigate('dashboard');
   initSSE();
