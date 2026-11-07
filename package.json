@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "powershell -NoProfile -Command \"if (-not (Test-Path 'public')) { New-Item -ItemType Directory -Force -Path 'public' }; Copy-Item -Recurse -Force dashboard/* public/; Copy-Item dashboard/*.html public/ -Force -ErrorAction SilentlyContinue; Copy-Item dashboard/*.js public/ -Force -ErrorAction SilentlyContinue\"",
+    "build": "node scripts/build.js",
     "deploy": "vercel --prod"
   },
   "dependencies": {
