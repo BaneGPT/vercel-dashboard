@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "cp -r dashboard public",
+    "build": "cp -r dashboard public && cp dashboard/affiliate-index.html public/affiliate-index.html && cp dashboard/affiliate-app.js public/affiliate-app.js && cp dashboard/admin-index.html public/admin-index.html && cp dashboard/admin-app.js public/admin-app.js && cp dashboard/negotiation-victim.html public/negotiation-victim.html && cp dashboard/negotiation-victim.js public/negotiation-victim.js && cp dashboard/negotiation-admin.html public/negotiation-admin.html && cp dashboard/negotiation-admin.js public/negotiation-admin.js",
     "deploy": "vercel --prod"
   },
   "dependencies": {

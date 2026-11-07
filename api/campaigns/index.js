@@ -83,7 +83,7 @@ async function handleGet(request, response) {
 
 // POST /api/campaigns - Create new campaign
 async function handlePost(request, response) {
-  const { name, description, apiKey, rsaKeySize = 4096 } = request.body;
+  const { name, description, apiKey, rsaKeySize = 4096, affiliateId } = request.body;
 
   if (!name) return response.status(400).json({ error: 'Campaign name required' });
 
@@ -99,6 +99,7 @@ async function handlePost(request, response) {
     status: 'active',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    affiliateId: affiliateId || null, // Track which affiliate owns this campaign
     settings: {
       exfilEnabled: true,
       encryptionMode: 'Hybrid',
@@ -112,7 +113,7 @@ async function handlePost(request, response) {
   // For now, we'll store a placeholder
   campaign.keyPlaceholder = true;
 
-  await Promise.all([
+  const operations = [
     kv.set(`campaign:${id}`, campaign),
     kv.sadd('global:campaigns', id),
     kv.hset(`campaign:${id}:stats`, {
@@ -121,7 +122,16 @@ async function handlePost(request, response) {
       totalBytes: 0,
       createdAt: campaign.createdAt
     })
-  ]);
+  ];
+
+  // If affiliateId provided, associate campaign with affiliate
+  if (affiliateId) {
+    operations.push(kv.sadd(`affiliate:${affiliateId}:campaigns`, id));
+    // Also track referral commission for campaign creation
+    await kv.hincrby(`affiliate:${affiliateId}:stats`, 'totalCampaignsCreated', 1);
+  }
+
+  await Promise.all(operations);
 
   response.status(201).json(campaign);
 }
