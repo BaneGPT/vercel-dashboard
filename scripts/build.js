@@ -5,8 +5,8 @@ import fs from 'fs';
 import path from 'path';
 
 const cwd = process.cwd();
-const dashboardDir = path.join(cwd, 'vercel-dashboard', 'dashboard');
-const publicDir = path.join(cwd, 'vercel-dashboard', 'public');
+const dashboardDir = path.join(cwd, 'dashboard');
+const publicDir = path.join(cwd, 'public');
 
 console.log('🔨 Building Chaos C2 Dashboard...');
 console.log(`Dashboard: ${dashboardDir}`);
@@ -49,7 +49,14 @@ function copyRecursive(src, dest) {
 // Copy dashboard/* to public/
 console.log('📂 Copying dashboard/ to public/...');
 const count = copyRecursive(dashboardDir, publicDir);
-console.log(`✅ Copied ${count} files`);
+console.log(`✅ Copied ${count} files}`);
+
+// Remove duplicate public/dashboard/ folder (not needed - rewrites handle routing)
+const duplicateDashboard = path.join(publicDir, 'dashboard');
+if (fs.existsSync(duplicateDashboard)) {
+  fs.rmSync(duplicateDashboard, { recursive: true, force: true });
+  console.log('🧹 Removed duplicate public/dashboard/ folder');
+}
 
 // Verify key files
 const requiredFiles = [
