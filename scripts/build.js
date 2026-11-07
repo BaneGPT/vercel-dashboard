@@ -5,12 +5,13 @@ import fs from 'fs';
 import path from 'path';
 
 const cwd = process.cwd();
-const dashboardDir = path.join(cwd, 'dashboard');
-const publicDir = path.join(cwd, 'public');
+const dashboardDir = path.join(cwd, 'vercel-dashboard', 'dashboard');
+const publicDir = path.join(cwd, 'vercel-dashboard', 'public');
 
 console.log('🔨 Building Chaos C2 Dashboard...');
 console.log(`Dashboard: ${dashboardDir}`);
 console.log(`Public: ${publicDir}`);
+console.log(`CWD: ${cwd}`);
 
 // Ensure public directory exists
 if (!fs.existsSync(publicDir)) {
@@ -22,7 +23,7 @@ if (!fs.existsSync(publicDir)) {
 function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) {
     console.log(`⚠️  Source not found: ${src}`);
-    return;
+    return 0;
   }
 
   const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -53,7 +54,7 @@ console.log(`✅ Copied ${count} files`);
 // Verify key files
 const requiredFiles = [
   'index.html',
-  'app.js',
+  'dashboard-main.js',
   'affiliate-index.html',
   'affiliate-app.js',
   'admin-index.html',
