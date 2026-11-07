@@ -11,7 +11,6 @@ const publicDir = path.join(cwd, 'public');
 console.log('🔨 Building Chaos C2 Dashboard...');
 console.log(`Dashboard: ${dashboardDir}`);
 console.log(`Public: ${publicDir}`);
-console.log(`CWD: ${cwd}`);
 
 // Ensure public directory exists
 if (!fs.existsSync(publicDir)) {
@@ -23,7 +22,7 @@ if (!fs.existsSync(publicDir)) {
 function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) {
     console.log(`⚠️  Source not found: ${src}`);
-    return 0;
+    return;
   }
 
   const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -49,19 +48,12 @@ function copyRecursive(src, dest) {
 // Copy dashboard/* to public/
 console.log('📂 Copying dashboard/ to public/...');
 const count = copyRecursive(dashboardDir, publicDir);
-console.log(`✅ Copied ${count} files}`);
-
-// Remove duplicate public/dashboard/ folder (not needed - rewrites handle routing)
-const duplicateDashboard = path.join(publicDir, 'dashboard');
-if (fs.existsSync(duplicateDashboard)) {
-  fs.rmSync(duplicateDashboard, { recursive: true, force: true });
-  console.log('🧹 Removed duplicate public/dashboard/ folder');
-}
+console.log(`✅ Copied ${count} files`);
 
 // Verify key files
 const requiredFiles = [
   'index.html',
-  'dashboard-main.js',
+  'app.js',
   'affiliate-index.html',
   'affiliate-app.js',
   'admin-index.html',

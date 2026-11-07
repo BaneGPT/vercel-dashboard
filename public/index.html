@@ -3,32 +3,280 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chaos C2 — Command & Control</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style id="design-system-styles"></style>
-</head>
-<body>
-  <div id="app"></div>
+  <title>Chaos C2 - Command & Control Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Error boundary for white screen
-    window.addEventListener('error', (e) => {
-      console.error('Global error:', e);
-      document.getElementById('app').innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#050505;color:#fff;padding:20px;font-family:system-ui;">
-          <div style="text-align:center;max-width:500px;">
-            <h2 style="color:#f43f5e;margin-bottom:16px;">Application Error</h2>
-            <p style="color:#9ca3af;margin-bottom:24px;">${e.message || 'Failed to load application'}</p>
-            <button onclick="location.reload()" style="background:#d6781e;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;">Reload</button>
-          </div>
-        `;
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      console.error('Unhandled rejection:', e.reason);
-    });
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            chaos: {
+              50: '#fdf8f0', 100: '#faebe0', 200: '#f4d3b5', 300: '#eab778',
+              400: '#e09542', 500: '#d6781e', 600: '#c45f15', 700: '#a04512',
+              800: '#813713', 900: '#683013', 950: '#381507'
+            },
+            acc: {
+              emerald: '#10b981', emeraldDim: 'rgba(16,185,129,0.15)',
+              amber: '#f59e0b', amberDim: 'rgba(245,158,11,0.15)',
+              rose: '#f43f5e', roseDim: 'rgba(244,63,94,0.15)',
+              sky: '#0ea5e9', skyDim: 'rgba(14,165,233,0.15)',
+              violet: '#8b5cf6', violetDim: 'rgba(139,92,246,0.15)',
+              cyan: '#06b6d4', cyanDim: 'rgba(6,182,212,0.15)'
+            },
+            surface: {
+              950: '#050505', 900: '#0d0d0d', 850: '#141414', 
+              800: '#1c1c1c', 750: '#242424', 700: '#2d2d2d'
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 2s linear infinite',
+            'fade-in': 'fadeIn 0.3s ease-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'slide-in-right': 'slideInRight 0.3s ease-out'
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            slideInRight: { '0%': { opacity: '0', transform: 'translateX(10px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } }
+          }
+        }
+      }
+    }
   </script>
-  <script type="module" src="/dashboard-main.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.umd.min.js"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .bg-grid { background-image: linear-gradient(rgba(214,120,30,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(214,120,30,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+    .bg-radial { background: radial-gradient(ellipse at 50% 0%, rgba(214,120,30,0.08) 0%, transparent 70%), #050505; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #141414; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #3d3d3d; border-radius: 3px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
+    .glass { background: rgba(28,28,28,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(214,120,30,0.1); }
+    .glass-hover:hover { border-color: rgba(214,120,30,0.3); box-shadow: 0 0 30px -10px rgba(214,120,30,0.15); }
+    .btn-primary { background: #c45f15; color: white; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; transition: all 0.2s; }
+    .btn-primary:hover { background: #d6781e; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #1c1c1c; color: #e5e5e5; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; border: 1px solid #374151; transition: all 0.2s; }
+    .btn-secondary:hover { background: #242424; }
+    .btn-secondary:active { transform: scale(0.98); }
+    .btn-ghost { color: #9ca3af; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; transition: all 0.2s; }
+    .btn-ghost:hover { color: white; background: #1c1c1c; }
+    .input-base { width: 100%; background: #1c1c1c; border: 1px solid #374151; border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: white; transition: all 0.2s; }
+    .input-base::placeholder { color: #6b7280; }
+    .input-base:focus { outline: none; box-shadow: 0 0 0 2px #d6781e; border-color: transparent; }
+    .card-base { background: #141414; border: 1px solid #2d2d2d; border-radius: 0.75rem; padding: 1.25rem; }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: white; }
+    .stat-label { font-size: 0.625rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 500; }
+    .badge-active { background: rgba(16,185,129,0.15); color: #10b981; }
+    .badge-inactive { background: #1f2937; color: #9ca3af; }
+    .badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .badge-danger { background: rgba(244,63,94,0.15); color: #f43f5e; }
+    .badge-info { background: rgba(14,165,233,0.15); color: #0ea5e9; }
+    .tab-btn { padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; color: #9ca3af; border-radius: 0.5rem; transition: all 0.2s; }
+    .tab-btn:hover { color: white; background: #1c1c1c; }
+    .tab-btn-active { color: #d6781e; background: rgba(56,21,7,0.5); border-bottom: 2px solid #d6781e; }
+    .table-header { padding: 0.75rem 1rem; font-size: 0.625rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(20,20,20,0.5); position: sticky; top: 0; }
+    .table-cell { padding: 0.75rem 1rem; font-size: 0.875rem; color: #d1d5db; border-top: 1px solid #2d2d2d; }
+    .table-row { transition: background 0.2s; cursor: pointer; }
+    .table-row:hover { background: rgba(28,28,28,0.5); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal-panel { background: #0d0d0d; border: 1px solid #374151; border-radius: 1rem; max-width: 48rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.4s ease-out; }
+    .chart-container { position: relative; height: 16rem; width: 100%; }
+    .chart-container-lg { position: relative; height: 20rem; width: 100%; }
+    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.125rem 0.375rem; background: #1c1c1c; border: 1px solid #374151; border-radius: 0.25rem; }
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; border-radius: 0.5rem; color: #9ca3af; transition: all 0.2s; }
+    .sidebar-link:hover { color: white; background: #1c1c1c; }
+    .sidebar-link-active { color: #d6781e; background: rgba(56,21,7,0.5); border-left: 2px solid #d6781e; }
+    .drop-zone { border: 2px dashed #374151; border-radius: 0.75rem; padding: 2rem; text-align: center; transition: all 0.2s; }
+    .drop-zone:hover { border-color: #d6781e; background: rgba(56,21,7,0.1); }
+    ::selection { background: rgba(214,120,30,0.3); color: white; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } }
+    .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
+    .animate-slide-up { animation: slideUp 0.4s ease-out; }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+  </style>
+</head>
+<body class="bg-surface-950 text-gray-100 min-h-screen bg-radial bg-grid">
+  <script>
+    window.__CHAOS_CONFIG__ = {
+      apiBase: '/api',
+      sseEndpoint: '/api/realtime/events'
+    };
+  </script>
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-surface-900 border-r border-gray-800 flex flex-col transform transition-transform duration-300 lg:translate-x-0 -translate-x-full">
+      <div class="flex flex-col h-full">
+        <!-- Logo -->
+        <div class="p-5 border-b border-gray-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-chaos-500 to-chaos-700 flex items-center justify-center relative overflow-hidden">
+            <svg class="w-6 h-6 text-surface-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent"></div>
+          </div>
+          <div>
+            <h1 class="font-bold text-white text-lg">Chaos C2</h1>
+            <p class="text-xs text-gray-500 font-mono">v2.4.1 • Live</p>
+          </div>
+        </div>
+
+        <!-- Campaign Selector -->
+        <div class="p-4 border-b border-gray-800">
+          <label class="block text-xs text-gray-500 uppercase tracking-wider mb-2">Active Campaign</label>
+          <select id="campaignSelect" class="input-base" onchange="switchCampaign(this.value)">
+            <option value="">Select campaign...</option>
+          </select>
+          <button class="btn-secondary w-full mt-2 text-xs" onclick="openCampaignModal()">+ New Campaign</button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
+          <a href="#" class="sidebar-link sidebar-link-active" data-view="overview" onclick="showView('overview'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span>Overview</span>
+            <span id="overviewBadge" class="ml-auto badge badge-active hidden">Live</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="systems" onclick="showView('systems'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span>Affected Systems</span>
+            <span id="systemsBadge" class="ml-auto badge badge-info hidden">0</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="campaigns" onclick="showView('campaigns'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <span>Campaigns & Keys</span>
+            <span id="campaignsBadge" class="ml-auto badge hidden">0</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="analytics" onclick="showView('analytics'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span>Analytics</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="geo" onclick="showView('geo'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"></circle></svg>
+            <span>Geographic</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="timeline" onclick="showView('timeline'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Timeline</span>
+          </a>
+          <a href="#" class="sidebar-link" data-view="files" onclick="showView('files'); return false;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            <span>File Explorer</span>
+          </a>
+        </nav>
+
+        <!-- Connection Status -->
+        <div class="p-4 border-t border-gray-800">
+          <div class="flex items-center gap-3">
+            <div id="connIndicator" class="w-2.5 h-2.5 rounded-full bg-gray-600"></div>
+            <div class="flex-1">
+              <p class="text-xs font-medium text-gray-300">Connection</p>
+              <p id="connStatus" class="text-xs text-gray-500">Disconnected</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-72 min-h-screen flex flex-col">
+      <!-- Top Bar -->
+      <header class="bg-surface-900/80 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-20">
+        <div class="flex items-center justify-between h-16 px-4 sm:px-6">
+          <div class="flex items-center gap-4">
+            <button class="lg:hidden p-2 rounded-lg hover:bg-surface-800" onclick="toggleSidebar()">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <h2 id="viewTitle" class="text-lg font-semibold text-white hidden sm:block">Overview</h2>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Time Range -->
+            <select id="timeRange" class="input-base w-auto py-1.5 text-sm" onchange="refreshView()">
+              <option value="1h">Last Hour</option>
+              <option value="6h">6 Hours</option>
+              <option value="24h" selected>24 Hours</option>
+              <option value="7d">7 Days</option>
+              <option value="30d">30 Days</option>
+            </select>
+
+            <!-- Refresh Button -->
+            <button id="refreshBtn" class="btn-secondary" onclick="refreshView()">
+              <svg class="w-4 h-4 mr-1" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              <span class="hidden sm:inline">Refresh</span>
+            </button>
+
+            <!-- Auth/User -->
+            <div class="flex items-center gap-3">
+              <button id="authBtn" class="btn-ghost text-xs" onclick="openAuthModal()">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <span id="authStatus">Sign In</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- View Tabs (Mobile) -->
+      <div class="lg:hidden overflow-x-auto px-3 py-2 border-b border-gray-800" id="mobileTabs">
+        <button class="tab-btn tab-btn-active whitespace-nowrap" data-view="overview" onclick="showView('overview')">Overview</button>
+        <button class="tab-btn whitespace-nowrap" data-view="systems" onclick="showView('systems')">Systems</button>
+        <button class="tab-btn whitespace-nowrap" data-view="campaigns" onclick="showView('campaigns')">Campaigns</button>
+        <button class="tab-btn whitespace-nowrap" data-view="analytics" onclick="showView('analytics')">Analytics</button>
+        <button class="tab-btn whitespace-nowrap" data-view="geo" onclick="showView('geo')">Geo</button>
+        <button class="tab-btn whitespace-nowrap" data-view="timeline" onclick="showView('timeline')">Timeline</button>
+        <button class="tab-btn whitespace-nowrap" data-view="files" onclick="showView('files')">Files</button>
+      </div>
+
+      <!-- View Content -->
+      <div class="flex-1 overflow-auto p-4 sm:p-6" id="viewContent">
+        <!-- Views rendered dynamically -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="modalRoot"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+  <!-- Chart.js Default Config -->
+  <script>
+    Chart.defaults.color = '#9ca3af';
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.borderColor = '#2d2d2d';
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.padding = 20;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#1c1c1c';
+    Chart.defaults.plugins.tooltip.borderColor = '#2d2d2d';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.titleFont.size = 13;
+    Chart.defaults.plugins.tooltip.bodyFont.size = 12;
+    Chart.defaults.plugins.tooltip.bodyFont.family = 'JetBrains Mono';
+    Chart.defaults.scales.x.grid.color = '#2d2d2d';
+    Chart.defaults.scales.y.grid.color = '#2d2d2d';
+  </script>
+
+  <!-- Main App Script -->
+  <script src="/app.js"></script>
 </body>
 </html>
