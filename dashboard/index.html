@@ -8,9 +8,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style id="design-system-styles"></style>
 </head>
 <body>
   <div id="app"></div>
+  <script>
+    // Error boundary for white screen
+    window.addEventListener('error', (e) => {
+      console.error('Global error:', e);
+      document.getElementById('app').innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#050505;color:#fff;padding:20px;font-family:system-ui;">
+          <div style="text-align:center;max-width:500px;">
+            <h2 style="color:#f43f5e;margin-bottom:16px;">Application Error</h2>
+            <p style="color:#9ca3af;margin-bottom:24px;">${e.message || 'Failed to load application'}</p>
+            <button onclick="location.reload()" style="background:#d6781e;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;">Reload</button>
+          </div>
+        `;
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('Unhandled rejection:', e.reason);
+    });
+  </script>
   <script type="module" src="/dashboard-main.js"></script>
 </body>
 </html>
