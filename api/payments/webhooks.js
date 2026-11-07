@@ -1,7 +1,7 @@
 // vercel-dashboard/api/payments/webhooks.js
 // Payment Webhooks Handler - Receives notifications from payment providers
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   // Allow all origins for webhooks

@@ -2,13 +2,14 @@
   "name": "chaos-dashboard",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "cp -r dashboard public && cp dashboard/affiliate-index.html public/affiliate-index.html && cp dashboard/affiliate-app.js public/affiliate-app.js && cp dashboard/admin-index.html public/admin-index.html && cp dashboard/admin-app.js public/admin-app.js && cp dashboard/negotiation-victim.html public/negotiation-victim.html && cp dashboard/negotiation-victim.js public/negotiation-victim.js && cp dashboard/negotiation-admin.html public/negotiation-admin.html && cp dashboard/negotiation-admin.js public/negotiation-admin.js",
+    "build": "powershell -Command \"Copy-Item -Recurse -Force dashboard public; Copy-Item dashboard/affiliate-index.html public/affiliate-index.html -Force; Copy-Item dashboard/affiliate-app.js public/affiliate-app.js -Force; Copy-Item dashboard/admin-index.html public/admin-index.html -Force; Copy-Item dashboard/admin-app.js public/admin-app.js -Force; Copy-Item dashboard/negotiation-victim.html public/negotiation-victim.html -Force; Copy-Item dashboard/negotiation-victim.js public/negotiation-victim.js -Force; Copy-Item dashboard/negotiation-admin.html public/negotiation-admin.html -Force; Copy-Item dashboard/negotiation-admin.js public/negotiation-admin.js -Force\"",
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "@vercel/kv": "^2.0.0"
+    "@upstash/redis": "^1.34.0"
   },
   "devDependencies": {
     "vercel": "^34.0.0"

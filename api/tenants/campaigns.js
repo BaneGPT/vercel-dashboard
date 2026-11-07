@@ -1,7 +1,7 @@
 // vercel-dashboard/api/tenants/campaigns.js
 // Tenant Campaign Management API
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 import { withTenantIsolation } from './middleware.js';
 
 export default async function handler(request, response) {

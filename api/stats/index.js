@@ -1,7 +1,7 @@
 // vercel-dashboard/api/stats/index.js
 // Dashboard stats endpoint - aggregates infection telemetry
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   if (request.method === 'OPTIONS') {

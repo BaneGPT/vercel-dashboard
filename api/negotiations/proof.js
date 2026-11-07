@@ -1,7 +1,7 @@
 // vercel-dashboard/api/negotiations/proof.js
 // Proof of Decryption API
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');

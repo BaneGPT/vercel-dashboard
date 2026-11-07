@@ -1,7 +1,7 @@
 // vercel-dashboard/api/tenants/middleware.js
 // Multi-Tenant Isolation Middleware
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 /**
  * Tenant Context - Holds tenant-specific data for request isolation

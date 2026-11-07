@@ -1,7 +1,7 @@
 // vercel-dashboard/api/affiliates/campaigns.js
 // Affiliate Campaigns API
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');

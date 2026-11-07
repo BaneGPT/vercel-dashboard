@@ -1,7 +1,7 @@
 // vercel-dashboard/api/realtime/events.js
 // Server-Sent Events for real-time dashboard updates
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');

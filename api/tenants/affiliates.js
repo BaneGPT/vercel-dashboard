@@ -1,7 +1,7 @@
 // vercel-dashboard/api/tenants/affiliates.js
 // Tenant Affiliate Management API
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 import { withTenantIsolation, getTenantContext } from './middleware.js';
 
 export default async function handler(request, response) {

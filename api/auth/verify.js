@@ -1,7 +1,7 @@
 // vercel-dashboard/api/auth/verify.js
 // Simple API key verification for dashboard access
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 const MASTER_KEYS = [
   // Add your master keys here, or use environment variable

@@ -1,7 +1,7 @@
 // vercel-dashboard/api/payments/index.js
 // Payment Processing API - Crypto & Fiat
 
-import { kv } from '@vercel/kv';
+import { kv } from '../../lib/kv.js';
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');
