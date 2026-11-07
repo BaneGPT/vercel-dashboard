@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "powershell -Command \"Copy-Item -Recurse -Force dashboard public; Copy-Item dashboard/affiliate-index.html public/affiliate-index.html -Force; Copy-Item dashboard/affiliate-app.js public/affiliate-app.js -Force; Copy-Item dashboard/admin-index.html public/admin-index.html -Force; Copy-Item dashboard/admin-app.js public/admin-app.js -Force; Copy-Item dashboard/negotiation-victim.html public/negotiation-victim.html -Force; Copy-Item dashboard/negotiation-victim.js public/negotiation-victim.js -Force; Copy-Item dashboard/negotiation-admin.html public/negotiation-admin.html -Force; Copy-Item dashboard/negotiation-admin.js public/negotiation-admin.js -Force\"",
+    "build": "node scripts/build.js",
     "deploy": "vercel --prod"
   },
   "dependencies": {
