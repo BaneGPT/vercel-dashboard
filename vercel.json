@@ -15,7 +15,6 @@
     "api/affiliates/payouts.js": { "maxDuration": 30 },
     "api/affiliates/referrals.js": { "maxDuration": 30 },
     "api/negotiations/index.js": { "maxDuration": 30 },
-    "api/negotiations/proof.js": { "maxDuration": 30 },
     "api/payments/index.js": { "maxDuration": 30 },
     "api/payments/webhooks.js": { "maxDuration": 30 }
   },
