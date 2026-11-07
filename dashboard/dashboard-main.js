@@ -2,7 +2,7 @@
 // Self-contained Chaos C2 Dashboard - No external module dependencies
 
 // ============================================
-// DESIGN SYSTEM (inlined)
+// DESIGN SYSTEM & UTILITIES
 // ============================================
 const theme = {
   colors: {
@@ -23,18 +23,12 @@ const theme = {
   transitions: { fast: '150ms ease', normal: '250ms ease', slow: '350ms ease' },
 };
 
-// ============================================
-// UTILITIES
-// ============================================
 const formatNumber = (n) => (n ?? 0).toLocaleString();
 const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
 const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
 const timeAgo = (iso) => { if (!iso) return '—'; const d = Date.now() - new Date(iso).getTime(); const m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000); if (m < 1) return 'Just now'; if (m < 60) return m+'m ago'; if (h < 24) return h+'h ago'; return dy+'d ago'; };
 const cn = (...c) => c.filter(Boolean).join(' ');
 
-// ============================================
-// COMPONENT FACTORY
-// ============================================
 const $ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; };
 const $$ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return Array.from(t.content.children); };
 
@@ -64,16 +58,6 @@ const IconPaths = {
   wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16',
   download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
   activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2',
-  shield3: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  target2: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-  shield4: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  users2: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-  rocket2c: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
-  lock2: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-  x2: 'M18 6L6 18M6 6l12 12',
-  check2: 'M20 6L9 17l-5-5',
-  plus2: 'M12 5v14M5 12h14',
-  search2: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
 };
 
 function ic(name, size = 20) {
@@ -278,31 +262,36 @@ h1,h2,h3,h4,h5,h6 { font-weight: 600; line-height: 1.3; letter-spacing: -0.02em;
 `;
 
 // ============================================
-// ICON HELPER
+// ICON PATHS
 // ============================================
+const IconPaths = {
+  dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
+  server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
+  rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  chart: 'M18 20V10M12 20V4M6 20v-6',
+  bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
+  menu: 'M3 12h18M3 6h18M3 18h18',
+  chevronDown: 'M6 9l6 6 6-6',
+  target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
+  lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
+  x: 'M18 6L6 18M6 6l12 12',
+  check: 'M20 6L9 17l-5-5',
+  plus: 'M12 5v14M5 12h14',
+  search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
+  activity: 'M22 12H18M15 21V12M9 3v9M6 12H2',
+  wallet: 'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-6M3 19a2 2 0 0 0 2 2h16',
+  download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
+  activity2: 'M22 12H18M15 21V12M9 3v9M6 12H2',
+};
+
 function ic(name, size = 20) {
-  const paths = {
-    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
-    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
-    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
-    chart: 'M18 20V10M12 20V4M6 20v-6',
-    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
-    menu: 'M3 12h18M3 6h18M3 18h18',
-    chevronDown: 'M6 9l6 6 6-6',
-    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
-    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c-1.26 1.5-.5-3.74 2 5zM12 19v3',
-    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x: 'M18 6L6 18M6 6l12 12',
-    check: 'M20 6L9 17l-5-5',
-    plus: 'M12 5v14M5 12h14',
-    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-  };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+  const path = IconPaths[name] || IconPaths.dashboard;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IconPaths[name] || IconPaths.dashboard}"/></svg>`;
 }
 
 // ============================================
@@ -311,32 +300,26 @@ function ic(name, size = 20) {
 document.getElementById('design-system-styles').textContent = STYLES;
 
 // ============================================
+// UTILITIES
+// ============================================
+const formatNumber = (n) => (n ?? 0).toLocaleString();
+const formatCurrency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(n ?? 0);
+const formatCompact = (n) => { if (!n) return '0'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return String(n); };
+const timeAgo = (iso) => { if (!iso) return '—'; const d = Date.now() - new Date(iso).getTime(); const m = Math.floor(d/60000), h = Math.floor(d/3600000), dy = Math.floor(d/86400000); if (m < 1) return 'Just now'; if (m < 60) return m+'m ago'; if (h < 24) return h+'h ago'; return dy+'d ago'; };
+const cn = (...c) => c.filter(Boolean).join(' ');
+
+// ============================================
 // ICON HELPER
 // ============================================
 function ic(name, size = 20) {
-  const paths = {
-    dashboard: 'M3 3h7v7H3V3zm11 0h7v7h-7V3zm0 11H3v7h7v-7zm11 0h7v-7h-7z',
-    server: 'M2 2h20v8H2V2zm0 12h20v8H2v-8zm4 4h.01M6 18h.01M16 6h.01M16 18h.01',
-    rocket: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
-    chart: 'M18 20V10M12 20V4M6 20v-6',
-    bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0',
-    menu: 'M3 12h18M3 6h18M3 18h18',
-    chevronDown: 'M6 9l6 6 6-6',
-    target: 'M12 22c-5.5 0-10-4.5-10-10S7 2 12 2s10 4.5 10 10-4.5 10-10 10zm0-8a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-10a4 4 0 1 1 0 8 4 4 0 0 1 0-8z',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    rocket2: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
-    shield2: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-    users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-    rocket2b: 'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5.5-3.74-2-5zm10-9c1.5-1.26 2-5 2-5s-3.74.5-5 2c1.26-1.5-.5-3.74 2 5zM12 19v3',
-    lock: 'M3 11h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11zM7 11V7a5 5 0 0 1 10 0v4',
-    x: 'M18 6L6 18M6 6l12 12',
-    check: 'M20 6L9 17l-5-5',
-    plus: 'M12 5v14M5 12h14',
-    search: 'M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z',
-  };
-  const path = paths[name] || paths.dashboard;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+  const path = IconPaths[name] || IconPaths.dashboard;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IconPaths[name] || IconPaths.dashboard}"/></svg>`;
 }
+
+// ============================================
+// CSS INJECTION
+// ============================================
+document.getElementById('design-system-styles').textContent = STYLES;
 
 // ============================================
 // COMPONENT HELPERS
@@ -478,6 +461,37 @@ function renderSidebar() {
   document.getElementById('sidebar-nav').innerHTML = items.map(item => `
     <a href="#" class="sidebar-link ${state.currentView === item.id ? 'sidebar-link-active' : ''}" onclick="navigate('${item.id}');return false;">${ic(item.icon, 20)}<span>${item.label}</span>${item.badge ? `<span class="badge badge-info">${item.badge}</span>` : ''}</a>
   `).join('');
+}
+
+function StatCard({ label, value, trend, icon, color = 'primary' }) {
+  const colors = { primary: '#d6781e', success: '#10b981', warning: '#f59e0b', danger: '#f43f5e', info: '#0ea5e9', violet: '#8b5cf6' };
+  const clr = colors[color] || colors.primary;
+  return `
+    <div class="card stat-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <p style="font-size:0.6875rem;text-transform:uppercase;letter-spacing:0.05em;color:#9ca3af;">${label}</p>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;margin-top:4px;">${value}</p>
+          ${trend ? `<p style="font-size:0.8125rem;margin-top:8px;display:flex;align-items:center;gap:4px;color:${trend.up ? '#10b981' : '#f43f5e'};"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> ${trend.value}</p>` : ''}
+        </div>
+        <div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${colors[color]},${colors[color]});">${ic(icon, 24)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function ChartCard({ title, subtitle, canvasId, height = 300 }) {
+  return `
+    <div class="card card-elevated">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <div>
+          <h3 style="font-size:1.0625rem;font-weight:600;">${title}</h3>
+          ${subtitle ? `<p style="font-size:0.8125rem;color:#9ca3af;">${subtitle}</p>` : ''}
+        </div>
+      </div>
+      <div style="position:relative;width:100%;height:${height}px;"><canvas id="${canvasId}"></canvas></div>
+    </div>
+  `;
 }
 
 function renderDashboard() {
