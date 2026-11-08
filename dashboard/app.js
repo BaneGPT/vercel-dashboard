@@ -1,4 +1,4 @@
-// Chaos C2 Dashboard - Main Application Logic (Refined v2)
+// Chaos C2 Dashboard - Main Application Logic (v3 - Unified Design System)
 
 const State = {
   currentView: 'overview',
@@ -88,6 +88,229 @@ function destroyChart(id) {
   if (State.charts[id]) { State.charts[id].destroy(); delete State.charts[id]; }
 }
 
+// ============ SKELETON LOADERS ============
+function showSkeleton(view) {
+  const skeletons = {
+    overview: `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        ${Array(4).fill(0).map(() => 
+          `<div class="card">`
+            `<div class="skeleton skeleton-text" style="width:40%"></div>`
+            `<div class="skeleton" style="height:2rem;width:60%;margin-top:0.5rem"></div>`
+            `<div class="skeleton skeleton-text" style="width:30%;margin-top:1rem"></div>`
+          `</div>`
+        ).join('')}
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:20rem"></div>
+        </div>
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:15%;margin-bottom:1rem"></div>
+          ${Array(5).fill(0).map(() => 
+            `<div style="display:flex;gap:1rem;padding:0.75rem 0;border-top:1px solid var(--border-subtle)">`
+              `<div class="skeleton" style="height:1rem;flex:1"></div>`
+              `<div class="skeleton" style="height:1rem;width:6rem"></div>`
+              `<div class="skeleton" style="height:1rem;width:4rem"></div>`
+            `</div>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="skeleton skeleton-text" style="width:15%;margin-bottom:1rem"></div>
+        ${Array(5).fill(0).map(() => 
+          `<div style="display:flex;gap:1rem;padding:0.75rem 0;border-top:1px solid var(--border-subtle)">`
+            `<div class="skeleton" style="height:1rem;flex:1"></div>`
+            `<div class="skeleton" style="height:1rem;width:6rem"></div>`
+            `<div class="skeleton" style="height:1rem;width:4rem"></div>`
+          `</div>`
+        ).join('')}
+      </div>
+    `,
+    systems: `
+      <div class="card">
+        <div style="display:flex;gap:1rem;margin-bottom:1rem">
+          <div class="skeleton" style="height:2.25rem;width:16rem"></div>
+          <div class="skeleton" style="height:2.25rem;width:8rem"></div>
+        </div>
+        ${Array(8).fill(0).map(() => 
+          `<div style="display:flex;gap:1rem;padding:0.75rem 0;border-top:1px solid var(--border-subtle)">`
+            `<div class="skeleton" style="height:1rem;width:8rem"></div>`
+            `<div class="skeleton" style="height:1rem;flex:1"></div>`
+            `<div class="skeleton" style="height:1rem;width:6rem"></div>`
+            `<div class="skeleton" style="height:1rem;width:4rem"></div>`
+          `</div>`
+        ).join('')}
+      </div>
+    `,
+    campaigns: `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${Array(6).fill(0).map(() => 
+          `<div class="card">`
+            `<div class="skeleton" style="height:1.5rem;width:40%;margin-bottom:1rem"></div>`
+            `<div class="skeleton skeleton-text" style="width:30%"></div>`
+            `<div class="grid grid-cols-3 gap-3 mt-4">`
+              `${Array(3).fill(0).map(() => 
+                `<div class="card p-3">`
+                  `<div class="skeleton skeleton-text" style="width:50%"></div>`
+                  `<div class="skeleton" style="height:2rem;width:80%;margin-top:0.5rem"></div>`
+                `</div>`
+              ).join('')}`
+            `</div>`
+          `</div>`
+        ).join('')}
+      </div>
+    `,
+    analytics: `
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:22rem"></div>
+        </div>
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:22rem"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:22rem"></div>
+        </div>
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:22rem"></div>
+        </div>
+      </div>
+    `,
+    geo: `
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div class="card lg:col-span-2">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:300px"></div>
+        </div>
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          ${Array(5).fill(0).map(() => 
+            `<div class="skeleton" style="height:3rem;width:100%"></div>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+        <div class="skeleton" style="height:20rem"></div>
+      </div>
+    `,
+    timeline: `
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="card lg:col-span-2">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          <div class="skeleton" style="height:22rem"></div>
+        </div>
+        <div class="card">
+          <div class="skeleton skeleton-text" style="width:20%;margin-bottom:1rem"></div>
+          ${Array(8).fill(0).map(() => 
+            `<div class="skeleton" style="height:3rem;width:100%"></div>`
+          ).join('')}
+        </div>
+      </div>
+    `,
+    files: `
+      <div class="card">
+        <div style="display:flex;gap:1rem;margin-bottom:1rem">
+          <div class="skeleton" style="height:2.25rem;width:16rem"></div>
+          <div class="skeleton" style="height:2.25rem;width:8rem"></div>
+        </div>
+        ${Array(8).fill(0).map(() => 
+          `<div style="display:flex;gap:1rem;padding:0.75rem 0;border-top:1px solid var(--border-subtle)">`
+            `<div class="skeleton" style="height:1rem;width:8rem"></div>`
+            `<div class="skeleton" style="height:1rem;flex:1"></div>`
+            `<div class="skeleton" style="height:1rem;width:6rem"></div>`
+            `<div class="skeleton" style="height:1rem;width:4rem"></div>`
+          `</div>`
+        ).join('')}
+      </div>
+    `,
+    default: `<div class="card">${'<div class="skeleton skeleton-text"></div>'.repeat(6)}</div>`
+  };
+  return skeletons[view] || skeletons.default;
+}
+
+// ============ EMPTY STATES ============
+function emptyState({ title, description, actionLabel, actionFn, icon }) {
+  return `
+    <div class="empty-state">
+      ${icon || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:3rem;height:3rem;margin-bottom:1rem;opacity:0.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`}
+      <h3>${title}</h3>
+      <p>${description}</p>
+      ${actionLabel ? `<button class="btn btn-primary" onclick="${actionFn}">${actionLabel}</button>` : ''}
+    </div>
+  `;
+}
+
+// ============ CONFIRM DIALOG ============
+function confirmDialog({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', variant = 'danger' }) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay open';
+    overlay.innerHTML = `
+      <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="cd-title">
+        <div class="modal-header">
+          <h3 id="cd-title" style="font-size:var(--text-lg);font-weight:600">${title}</h3>
+        </div>
+        <div class="modal-body">
+          <p style="color:var(--text-secondary);font-size:var(--text-sm);line-height:1.6">${message}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-action="cancel">${cancelLabel}</button>
+          <button class="btn btn-${variant}" data-action="confirm">${confirmLabel}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const cleanup = (result) => { overlay.remove(); resolve(result); };
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) cleanup(false);
+      if (e.target.dataset.action === 'confirm') cleanup(true);
+      if (e.target.dataset.action === 'cancel') cleanup(false);
+    });
+    overlay.querySelector('[data-action="confirm"]').focus();
+    
+    const escHandler = (e) => { if (e.key === 'Escape') { cleanup(false); document.removeEventListener('keydown', escHandler); } };
+    document.addEventListener('keydown', escHandler);
+  });
+}
+
+// ============ PROGRESS TOAST ============
+async function withProgressToast(label, fn) {
+  const id = 'toast-' + Date.now();
+  const container = $('#toastContainer');
+  const toast = document.createElement('div');
+  toast.id = id;
+  toast.className = 'toast';
+  toast.dataset.type = 'info';
+  toast.innerHTML = `
+    <div style="width:1rem;height:1rem;border:2px solid var(--chaos-500);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
+    <span>${label}...</span>
+  `;
+  container.appendChild(toast);
+  
+  try {
+    const result = await fn();
+    toast.dataset.type = 'success';
+    toast.innerHTML = `<span>✓ ${label} complete</span>`;
+    setTimeout(() => toast.remove(), 2500);
+    return result;
+  } catch (e) {
+    toast.dataset.type = 'error';
+    toast.innerHTML = `<span>✕ ${label} failed: ${e.message}</span>`;
+    setTimeout(() => toast.remove(), 4000);
+    throw e;
+  }
+}
+
 // ============ VIEW RENDERING ============
 async function renderView(view) {
   State.currentView = view;
@@ -102,7 +325,7 @@ async function renderView(view) {
 
   const content = $('#viewContent');
   if (!content) return;
-  content.innerHTML = '<div class="flex items-center justify-center h-48"><div class="w-8 h-8 border-3 border-chaos-500 border-t-transparent rounded-full animate-spin"></div></div>';
+  content.innerHTML = showSkeleton(view);
 
   try {
     switch (view) {
@@ -116,10 +339,10 @@ async function renderView(view) {
       default: await renderOverview();
     }
     // Stagger in cards
-    EnhancedUI.animations.staggerIn(content.querySelectorAll('.card-base, article'), 30);
+    EnhancedUI.animations.staggerIn(content.querySelectorAll('.card, article'), 30);
   } catch (e) {
     console.error(`Render ${view} error:`, e);
-    content.innerHTML = `<div class="card-base text-center py-12"><svg class="w-10 h-10 mx-auto text-acc-rose mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><h3 class="text-lg font-semibold mb-2">Failed to load</h3><p class="text-gray-500 mb-4">${e.message}</p><button class="btn-primary" onclick="renderView('${view}')">Retry</button></div>`;
+    content.innerHTML = `<div class="card text-center py-12">${emptyState({ title: 'Failed to load', description: e.message, actionLabel: 'Retry', actionFn: "renderView('${view}')" })}</div>`;
   }
 }
 
@@ -152,7 +375,7 @@ async function renderOverview() {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <article class="card-base">
+      <article class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-display font-semibold text-lg">Daily Activity (7 Days)</h3>
           <div class="flex items-center gap-2">
@@ -163,22 +386,22 @@ async function renderOverview() {
         <div class="chart-container-lg"><canvas id="overviewDailyChart"></canvas></div>
       </article>
 
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">File Types Exfiltrated</h3>
         <div class="chart-container-lg"><canvas id="overviewExtTreemap"></canvas></div>
       </article>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-      <article class="card-base lg:col-span-1">
+      <article class="card lg:col-span-1">
         <h3 class="font-display font-semibold text-lg mb-4">System Status</h3>
         <div class="chart-container"><canvas id="overviewStatusChart"></canvas></div>
       </article>
 
-      <article class="card-base lg:col-span-2">
+      <article class="card lg:col-span-2">
         <h3 class="font-display font-semibold text-lg mb-4">Campaign Performance</h3>
         <div class="scrollbar-thin overflow-x-auto">
-          <table class="w-full min-w-[600px]">
+          <table class="w-full min-w-[600px] table">
             <thead>
               <tr>
                 <th class="table-header">Campaign</th>
@@ -206,13 +429,13 @@ async function renderOverview() {
       </article>
     </div>
 
-    <article class="card-base">
+    <article class="card">
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-display font-semibold text-lg">Recent Infections</h3>
-        <button class="btn-ghost text-sm" onclick="showView('systems')">View All →</button>
+        <button class="btn btn-ghost text-sm" onclick="showView('systems')">View All →</button>
       </div>
       <div class="scrollbar-thin overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full table">
           <thead>
             <tr>
               <th class="table-header">Victim ID</th>
@@ -320,29 +543,29 @@ async function renderSystems() {
   
   content.innerHTML = `
     <div class="flex flex-col gap-4">
-      <div class="card-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <input type="text" id="sysSearch" placeholder="Search systems…" class="input-base w-full sm:w-64" oninput="filterSystems()">
-          <select id="sysStatusFilter" class="input-base w-auto" onchange="filterSystems()">
+          <input type="text" id="sysSearch" placeholder="Search systems…" class="input w-full sm:w-64" oninput="filterSystems()">
+          <select id="sysStatusFilter" class="input w-auto" onchange="filterSystems()">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="idle">Idle</option>
             <option value="offline">Offline</option>
           </select>
-          <select id="sysCampaignFilter" class="input-base w-auto" onchange="filterSystems()">
+          <select id="sysCampaignFilter" class="input w-auto" onchange="filterSystems()">
             <option value="">All Campaigns</option>
             ${State.campaigns.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
           </select>
         </div>
         <div class="flex gap-2">
-          <button class="btn-secondary" onclick="exportSystems()">Export CSV</button>
-          <button class="btn-primary" onclick="refreshView()">Refresh</button>
+          <button class="btn btn-secondary" onclick="exportSystems()">Export CSV</button>
+          <button class="btn btn-primary" onclick="refreshView()">Refresh</button>
         </div>
       </div>
 
-      <div class="card-base overflow-hidden">
+      <div class="card overflow-hidden">
         <div class="scrollbar-thin overflow-x-auto">
-          <table class="w-full min-w-[1000px]">
+          <table class="w-full min-w-[1000px] table">
             <thead>
               <tr>
                 <th class="table-header w-32">Victim ID</th>
@@ -367,8 +590,8 @@ async function renderSystems() {
         <div class="p-4 border-t border-gray-800/50 flex items-center justify-between">
           <span id="sysPaginationInfo" class="text-sm text-gray-400">Loading…</span>
           <div class="flex gap-2">
-            <button id="sysPrevPage" class="btn-secondary text-sm" onclick="changeSysPage(-1)" disabled>Previous</button>
-            <button id="sysNextPage" class="btn-secondary text-sm" onclick="changeSysPage(1)" disabled>Next</button>
+            <button id="sysPrevPage" class="btn btn-secondary text-sm" onclick="changeSysPage(-1)" disabled>Previous</button>
+            <button id="sysNextPage" class="btn btn-secondary text-sm" onclick="changeSysPage(1)" disabled>Next</button>
           </div>
         </div>
       </div>
@@ -473,7 +696,7 @@ async function renderCampaigns() {
     <div class="flex flex-col gap-4">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h2 class="font-display font-semibold text-xl">Campaigns</h2>
-        <button class="btn-primary" onclick="openCampaignModal()">
+        <button class="btn btn-primary" onclick="openCampaignModal()">
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
           New Campaign
         </button>
@@ -481,10 +704,13 @@ async function renderCampaigns() {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="campaignsGrid">
         ${State.campaigns.map(c => EnhancedUI.components.CampaignCard(c)).join('') || `
-          <div class="col-span-full card-base text-center py-12">
-            <svg class="w-10 h-10 mx-auto text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-            <p class="text-gray-500 mb-2">No campaigns yet</p>
-            <button class="btn-primary" onclick="openCampaignModal()">Create Campaign</button>
+          <div class="col-span-full card text-center py-12">
+            ${emptyState({
+              title: 'No campaigns yet',
+              description: 'Create your first campaign to start tracking infections.',
+              actionLabel: 'Create Campaign',
+              actionFn: "openCampaignModal()"
+            })}
           </div>
         `}
       </div>
@@ -497,40 +723,40 @@ async function openCampaignModal(campaign = null) {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay open';
   modal.innerHTML = `
-    <div class="modal-panel">
-      <div class="p-5 border-b border-gray-800/50 flex items-center justify-between">
+    <div class="modal">
+      <div class="modal-header">
         <h3 class="font-display font-semibold text-lg">${isEdit ? 'Edit Campaign' : 'New Campaign'}</h3>
         <button class="btn-icon" onclick="this.closest('.modal-overlay').remove()" aria-label="Close">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <form id="campaignForm" class="p-5 space-y-4">
+      <form id="campaignForm" class="modal-body space-y-4">
         <div>
           <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Campaign Name</label>
-          <input type="text" name="name" class="input-base" value="${campaign?.name || ''}" ${isEdit ? 'readonly' : 'required'} placeholder="Enter campaign name">
+          <input type="text" name="name" class="input" value="${campaign?.name || ''}" ${isEdit ? 'readonly' : 'required'} placeholder="Enter campaign name">
         </div>
         <div>
           <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
-          <textarea name="description" class="input-base min-h-[80px] resize-y" placeholder="Optional description">${campaign?.description || ''}</textarea>
+          <textarea name="description" class="input min-h-[80px] resize-y" placeholder="Optional description">${campaign?.description || ''}</textarea>
         </div>
         <div>
           <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">RSA Key Size</label>
-          <select name="rsaKeySize" class="input-base">
+          <select name="rsaKeySize" class="input">
             <option value="2048" ${campaign?.rsaKeySize === 2048 ? 'selected' : ''}>2048-bit</option>
             <option value="4096" ${campaign?.rsaKeySize !== 2048 ? 'selected' : ''}>4096-bit (recommended)</option>
           </select>
         </div>
         <div>
           <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Status</label>
-          <select name="status" class="input-base">
+          <select name="status" class="input">
             <option value="active" ${campaign?.status === 'active' ? 'selected' : ''}>Active</option>
             <option value="paused" ${campaign?.status === 'paused' ? 'selected' : ''}>Paused</option>
             <option value="archived" ${campaign?.status === 'archived' ? 'selected' : ''}>Archived</option>
           </select>
         </div>
-        <div class="flex justify-end gap-3 pt-2 border-t border-gray-800/50">
-          <button type="button" class="btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-          <button type="submit" class="btn-primary">${isEdit ? 'Save Changes' : 'Create Campaign'}</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+          <button type="submit" class="btn btn-primary">${isEdit ? 'Save Changes' : 'Create Campaign'}</button>
         </div>
       </form>
     </div>
@@ -566,7 +792,7 @@ async function openCampaignModal(campaign = null) {
 }
 
 async function deleteCampaign(id) {
-  if (!confirm('Delete this campaign? This will remove all associated systems and files.')) return;
+  if (!await confirmDialog({ title: 'Delete campaign?', message: 'This will remove all associated systems and files. This action cannot be undone.', confirmLabel: 'Delete Campaign' })) return;
   try {
     await api('/campaigns?id=' + id, { method: 'DELETE' });
     showToast('Campaign deleted', 'success');
@@ -577,7 +803,7 @@ async function deleteCampaign(id) {
 }
 
 async function regenerateCampaignKey(id) {
-  if (!confirm('Regenerate API key? The old key will be invalidated.')) return;
+  if (!await confirmDialog({ title: 'Regenerate API key?', message: 'The old key will be invalidated immediately.' })) return;
   try {
     const newKey = await api('/campaigns', { method: 'PUT', body: JSON.stringify({ id, apiKey: 'ck_' + Math.random().toString(36).slice(2, 26) }) });
     showToast(`New API key generated`, 'success');
@@ -596,8 +822,8 @@ async function openCampaignDetail(id) {
     const modal = document.createElement('div');
     modal.className = 'modal-overlay open';
     modal.innerHTML = `
-      <div class="modal-panel max-w-4xl">
-        <div class="p-5 border-b border-gray-800/50 flex items-center justify-between">
+      <div class="modal modal-lg">
+        <div class="modal-header">
           <div>
             <h3 class="font-display font-semibold text-lg">${detail.name}</h3>
             <p class="text-xs text-gray-500 font-mono mt-0.5">${detail.id}</p>
@@ -606,23 +832,23 @@ async function openCampaignDetail(id) {
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div class="p-5 space-y-5 overflow-y-auto" style="max-height: 70vh">
+        <div class="modal-body space-y-5 overflow-y-auto" style="max-height: 70vh">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             ${EnhancedUI.components.MetricCard({ label: 'Infections', value: fmtNumber(detail.stats?.totalInfections), trend: 0, color: 'success', icon: '🦠' })}
             ${EnhancedUI.components.MetricCard({ label: 'Files', value: fmtNumber(detail.stats?.totalFiles), trend: 0, color: 'info', icon: '📁' })}
             ${EnhancedUI.components.MetricCard({ label: 'Data', value: fmtBytes(detail.stats?.totalBytes), trend: 0, color: 'primary', icon: '💾' })}
           </div>
           
-          <div class="card-base">
+          <div class="card">
             <h4 class="font-medium text-white mb-3">API Key</h4>
             <div class="flex items-center gap-2">
               <code class="font-mono bg-surface-900 px-3 py-2 rounded-lg text-sm flex-1 break-all">${detail.apiKey}</code>
-              <button class="btn-secondary" onclick="navigator.clipboard.writeText('${detail.apiKey}'); showToast('Copied!', 'success')">Copy</button>
-              <button class="btn-ghost" onclick="regenerateCampaignKey('${detail.id}')">Regenerate</button>
+              <button class="btn btn-secondary" onclick="navigator.clipboard.writeText('${detail.apiKey}'); showToast('Copied!', 'success')">Copy</button>
+              <button class="btn btn-ghost" onclick="regenerateCampaignKey('${detail.id}')">Regenerate</button>
             </div>
           </div>
           
-          <div class="card-base">
+          <div class="card">
             <h4 class="font-medium text-white mb-3">Settings</h4>
             <dl class="grid grid-cols-2 gap-3 text-sm">
               <dt class="text-gray-500">RSA Key Size</dt>
@@ -636,10 +862,10 @@ async function openCampaignDetail(id) {
             </dl>
           </div>
           
-          <div class="card-base">
+          <div class="card">
             <h4 class="font-medium text-white mb-3">Systems (${detail.systems?.length || 0})</h4>
             <div class="scrollbar-thin max-h-64 overflow-y-auto">
-              <table class="w-full">
+              <table class="w-full table">
                 <thead><tr><th class="table-header">Victim ID</th><th class="table-header">Hostname</th><th class="table-header">Status</th><th class="table-header text-right">Files</th></tr></thead>
                 <tbody class="divide-y divide-gray-800/50">
                   ${(detail.systems || []).map(sys => `
@@ -659,9 +885,7 @@ async function openCampaignDetail(id) {
     </div>
   `;
   document.getElementById('modalRoot').appendChild(modal);
-  EnhancedUI.animations.staggerIn(modal.querySelectorAll('.card-base'), 30);
-  EnhancedUI.animations.countUp(modal.querySelector('[data-count]'), 0, 100, 800); // placeholder
-  // Actually animate the stat values
+  EnhancedUI.animations.staggerIn(modal.querySelectorAll('.card'), 30);
   modal.querySelectorAll('.stat-value').forEach(el => {
     const target = parseInt(el.textContent.replace(/,/g, '')) || 0;
     if (target > 0) EnhancedUI.animations.countUp(el, 0, target, 800);
@@ -683,21 +907,21 @@ async function renderAnalytics() {
 
   content.innerHTML = `
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">30-Day Trends</h3>
         <div class="chart-container-xl"><canvas id="analyticsTrendsChart"></canvas></div>
       </article>
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">Extensions Distribution</h3>
         <div class="chart-container-xl"><canvas id="analyticsExtChart"></canvas></div>
       </article>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">Activity Heatmap</h3>
         <div class="chart-container-xl"><canvas id="analyticsHeatmapChart"></canvas></div>
       </article>
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">Campaign Radar</h3>
         <div class="chart-container-xl"><canvas id="analyticsRadarChart"></canvas></div>
       </article>
@@ -796,13 +1020,13 @@ async function renderGeo() {
 
   content.innerHTML = `
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-      <article class="card-base lg:col-span-2">
+      <article class="card lg:col-span-2">
         <h3 class="font-display font-semibold text-lg mb-4">Global Infections</h3>
         <div class="chart-container-xl" style="min-height: 300px;">
           <canvas id="geoMapCanvas" style="width:100%;height:100%"></canvas>
         </div>
       </article>
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">Top Countries</h3>
         <div class="space-y-3" id="geoCountriesList">
           <div class="skeleton h-14 w-full"></div>
@@ -813,7 +1037,7 @@ async function renderGeo() {
         </div>
       </article>
     </div>
-    <article class="card-base">
+    <article class="card">
       <h3 class="font-display font-semibold text-lg mb-4">ISP Breakdown</h3>
       <div class="chart-container-lg"><canvas id="geoIspChart"></canvas></div>
     </article>
@@ -922,11 +1146,11 @@ async function renderTimeline() {
 
   content.innerHTML = `
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <article class="card-base lg:col-span-2">
+      <article class="card lg:col-span-2">
         <h3 class="font-display font-semibold text-lg mb-4">Infection Timeline</h3>
         <div class="chart-container-xl"><canvas id="timelineChart"></canvas></div>
       </article>
-      <article class="card-base">
+      <article class="card">
         <h3 class="font-display font-semibold text-lg mb-4">Event Stream</h3>
         <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin" id="timelineEvents">
           <div class="skeleton h-12 w-full"></div>
@@ -989,7 +1213,7 @@ async function loadTimelineEvents() {
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
             <p class="font-medium text-white">${e.title}</p>
-            <span class="text-xs text-gray-500 font-mono">${e.time}</span>
+            <span class="text-xs text-gray-400 font-mono">${e.time}</span>
           </div>
           <p class="text-sm text-gray-400 mt-0.5 truncate">${e.desc}</p>
         </div>
@@ -1005,13 +1229,13 @@ async function renderFiles() {
 
   content.innerHTML = `
     <div class="flex flex-col gap-4">
-      <div class="card-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <input type="text" id="fileSearch" placeholder="Search files…" class="input-base w-full sm:w-64" oninput="filterFiles()">
-          <select id="fileSystemFilter" class="input-base w-auto" onchange="filterFiles()">
+          <input type="text" id="fileSearch" placeholder="Search files…" class="input w-full sm:w-64" oninput="filterFiles()">
+          <select id="fileSystemFilter" class="input w-auto" onchange="filterFiles()">
             <option value="">All Systems</option>
           </select>
-          <select id="fileExtFilter" class="input-base w-auto" onchange="filterFiles()">
+          <select id="fileExtFilter" class="input w-auto" onchange="filterFiles()">
             <option value="">All Extensions</option>
             <option value=".txt">.txt</option>
             <option value=".pdf">.pdf</option>
@@ -1022,9 +1246,9 @@ async function renderFiles() {
         </div>
       </div>
 
-      <div class="card-base overflow-hidden">
+      <div class="card overflow-hidden">
         <div class="scrollbar-thin overflow-x-auto">
-          <table class="w-full min-w-[900px]">
+          <table class="w-full min-w-[900px] table">
             <thead>
               <tr>
                 <th class="table-header w-36">Filename</th>
@@ -1036,7 +1260,7 @@ async function renderFiles() {
               </tr>
             </thead>
             <tbody id="filesBody" class="divide-y divide-gray-800/50">
-              <tr><td colspan="6" class="table-cell text-center text-gray-500 py-8">Select a system to browse files</td></tr>
+              <tr><td colspan="6" class="table-cell text-center text-gray-500 py-8">${emptyState({ title: 'No files to display', description: 'Select a system and campaign to browse exfiltrated files.', actionLabel: 'Go to Systems', actionFn: "showView('systems')" })}</td></tr>
             </tbody>
           </table>
         </div>
@@ -1234,6 +1458,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'r' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); refreshView(); }
     if (e.key === 'Escape') { $$('.modal-overlay').forEach(m => m.remove()); $$('.dropdown-menu').forEach(m => m.classList.add('hidden')); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      CommandPalette.isOpen ? CommandPalette.close() : CommandPalette.open();
+    }
+  });
+
+  // G-then-key navigation
+  let gPressed = false;
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea, [contenteditable]')) return;
+    if (e.key === 'g') { gPressed = true; setTimeout(() => gPressed = false, 1000); return; }
+    if (gPressed) {
+      const map = { o: 'overview', s: 'systems', c: 'campaigns', a: 'analytics', g: 'geo', t: 'timeline', f: 'files' };
+      if (map[e.key]) { e.preventDefault(); showView(map[e.key]); gPressed = false; }
+    }
   });
 
   await loadCampaigns();
@@ -1242,6 +1481,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Animate stat cards on load
   setTimeout(() => EnhancedUI.animations.staggerIn(document.querySelectorAll('#statCards > article'), 40), 100);
+  
+  // Register command palette commands
+  CommandPalette.register([
+    { id: 'view-overview', label: 'Go to Overview', category: 'Navigation', icon: '▦', shortcut: 'G O', run: () => showView('overview') },
+    { id: 'view-systems', label: 'Go to Systems', category: 'Navigation', icon: '▤', shortcut: 'G S', run: () => showView('systems') },
+    { id: 'view-campaigns', label: 'Go to Campaigns', category: 'Navigation', icon: '◈', run: () => showView('campaigns') },
+    { id: 'view-analytics', label: 'Go to Analytics', category: 'Navigation', icon: '◐', run: () => showView('analytics') },
+    { id: 'view-geo', label: 'Go to Geographic', category: 'Navigation', icon: '◍', run: () => showView('geo') },
+    { id: 'view-timeline', label: 'Go to Timeline', category: 'Navigation', icon: '◷', run: () => showView('timeline') },
+    { id: 'view-files', label: 'Go to Files', category: 'Navigation', icon: '▣', run: () => showView('files') },
+    { id: 'new-campaign', label: 'Create New Campaign', category: 'Actions', icon: '+', keywords: ['add', 'create'], run: () => openCampaignModal() },
+    { id: 'refresh', label: 'Refresh Current View', category: 'Actions', icon: '↻', shortcut: '⌘R', run: () => refreshView() },
+    { id: 'signout', label: 'Sign Out', category: 'Account', icon: '⏻', run: () => signOut() },
+    { id: 'theme-chaos', label: 'Switch to Chaos Theme', category: 'Appearance', icon: '◑', run: () => EnhancedUI.themes.applyTheme('chaos') },
+    { id: 'theme-matrix', label: 'Switch to Matrix Theme', category: 'Appearance', icon: '◑', run: () => EnhancedUI.themes.applyTheme('matrix') },
+    { id: 'theme-midnight', label: 'Switch to Midnight Theme', category: 'Appearance', icon: '◑', run: () => EnhancedUI.themes.applyTheme('midnight') },
+  ]);
 });
 
 // Expose globals

@@ -1,4 +1,5 @@
-// Chaos C2 Dashboard - Enhanced UI & Charts Module (v2 - Refined)
+// Chaos C2 Dashboard - Enhanced UI & Charts Module (v3 - Fixed & Enhanced)
+
 const EnhancedUI = {
   // ============================================================
   // ADDITIONAL CHART TYPES
@@ -63,10 +64,6 @@ const EnhancedUI = {
             tooltip: {
               backgroundColor: '#111',
               borderColor: '#2a2a2a',
-              borderWidth: 1,
-              padding: 10,
-              titleFont: { size: 12, weight: '600' },
-              bodyFont: { size: 11, family: 'JetBrains Mono' },
               callbacks: {
                 label: (ctx) => {
                   if (ctx.datasetIndex === 0)
@@ -516,69 +513,82 @@ const EnhancedUI = {
   // ============================================================
   
   components: {
-    // Metric Card with sparkline
+    // Metric Card with sparkline - FIXED
     MetricCard: function({ label, value, trend, unit, color, sparklineData, icon }) {
       const trendClass = trend > 0 ? 'text-acc-emerald' : trend < 0 ? 'text-acc-rose' : 'text-gray-500';
       const trendIcon = trend > 0 ? '↗' : trend < 0 ? '↘' : '→';
-      const colorVar = `var(--chaos-${color})`;
       
-      let sparklineHtml = '';
-      if (sparklineData && sparklineData.length) {
-        const canvasId = 'spark-' + Math.random().toString(36).slice(2);
-        sparklineHtml = `<canvas id="${canvasId}" class="absolute bottom-0 right-0 w-28 h-14 opacity-40 group-hover:opacity-100 transition-opacity" style="pointer-events:none"></canvas>`;
-        setTimeout(() => {
-          const c = document.getElementById(canvasId);
-          if (c) {
-            const ctx = c.getContext('2d');
-            const max = Math.max(...sparklineData);
-            const min = Math.min(...sparklineData);
-            const range = max - min || 1;
-            const gradient = ctx.createLinearGradient(0, 0, 0, 30);
-            gradient.addColorStop(0, colorVar.replace(')', ', 0.3)').replace('rgba(', 'rgba('));
-            gradient.addColorStop(1, colorVar.replace(')', ', 0)').replace('rgba(', 'rgba('));
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.moveTo(0, 30);
-            sparklineData.forEach((val, i) => {
-              const x = (i / (sparklineData.length - 1)) * 112;
-              const y = 30 - ((val - min) / range) * 30;
-              ctx.lineTo(x, y);
-            });
-            ctx.lineTo(112, 30);
-            ctx.closePath();
-            ctx.fill();
-            ctx.strokeStyle = colorVar;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            sparklineData.forEach((val, i) => {
-              const x = (i / (sparklineData.length - 1)) * 112;
-              const y = 30 - ((val - min) / range) * 30;
-              if (i === 0) ctx.moveTo(x, y);
-              else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-          }
-        }, 0);
+      // Resolve color hex from token name
+      const colorMap = {
+        primary: '#d6781e', success: '#10b981', info: '#0ea5e9',
+        warning: '#f59e0b', danger: '#f43f5e', violet: '#8b5cf6',
+        emerald: '#10b981', sky: '#0ea5e9', amber: '#f59e0b', rose: '#f43f5e'
+      };
+      const colorHex = colorMap[color] || colorMap.primary;
+      
+      const sparkId = 'spark-' + Math.random().toString(36).slice(2, 9);
+      
+      // Defer sparkline render until after HTML insertion
+      if (sparklineData?.length) {
+        requestAnimationFrame(() => {
+          const canvas = document.getElementById(sparkId);
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          const dpr = window.devicePixelRatio || 1;
+          const W = 112, H = 40;
+          canvas.width = W * dpr; canvas.height = H * dpr;
+          canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+          ctx.scale(dpr, dpr);
+          
+          const max = Math.max(...sparklineData);
+          const min = Math.min(...sparklineData);
+          const range = max - min || 1;
+          
+          const pts = sparklineData.map((v, i) => ({
+            x: (i / (sparklineData.length - 1)) * W,
+            y: H - ((v - min) / range) * H
+          }));
+          
+          // Fill
+          const grad = ctx.createLinearGradient(0, 0, 0, H);
+          grad.addColorStop(0, colorHex + '55');
+          grad.addColorStop(1, colorHex + '00');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(0, H);
+          pts.forEach(p => ctx.lineTo(p.x, p.y));
+          ctx.lineTo(W, H);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Line
+          ctx.strokeStyle = colorHex;
+          ctx.lineWidth = 1.5;
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+          ctx.stroke();
+        });
       }
       
       return `
-        <article class="card-base relative overflow-hidden group flex flex-col" style="animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both">
-          <div class="absolute inset-0 bg-gradient-to-tr from-[${colorVar}]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <article class="card relative overflow-hidden group" style="animation: slideUp 0.4s var(--ease-out) both">
           <div class="relative z-10 flex items-start justify-between">
             <div>
               <p class="stat-label">${label}</p>
               <div class="flex items-baseline gap-2 mt-1">
-                <span class="stat-value font-mono" style="color: ${colorVar}">${value}</span>
+                <span class="stat-value font-mono" style="color: ${colorHex}">${value}</span>
                 ${unit ? `<span class="text-sm text-gray-500">${unit}</span>` : ''}
               </div>
             </div>
-            ${icon ? `<div class="avatar bg-gradient-to-br from-[${colorVar}] to-[${colorVar}]/70 text-surface-950">${icon}</div>` : ''}
+            ${icon ? `<div class="avatar" style="background: ${colorHex}22; color: ${colorHex}">${icon}</div>` : ''}
           </div>
-          <div class="flex items-center gap-2 relative z-10 mt-auto pt-3">
+          <div class="flex items-center gap-2 relative z-10 mt-3">
             <span class="${trendClass} text-xs font-medium">${trendIcon} ${Math.abs(trend).toFixed(1)}%</span>
             <span class="text-xs text-gray-500">vs last period</span>
           </div>
-          ${sparklineHtml}
+          ${sparklineData ? `<canvas id="${sparkId}" class="absolute bottom-2 right-2 opacity-40 group-hover:opacity-100 transition-opacity pointer-events-none"></canvas>` : ''}
         </article>
       `;
     },
@@ -638,24 +648,26 @@ const EnhancedUI = {
           </td>
         ` : '';
         
-        return `<tr class="table-row" data-key="${key}" tabindex="0">${checkboxHtml}${cells}${actionHtml}</tr>`;
+        return `<tr class="table-row" data-key="${key}" tabindex="0" ${actions || selectable ? 'data-clickable' : ''}>${checkboxHtml}${cells}${actionHtml}</tr>`;
       }).join('');
       
       if (rows.length === 0) {
         return `
-          <div class="card-base">
-            <div class="text-center py-12">
-              <svg class="w-10 h-10 mx-auto text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              <p class="text-gray-500">${emptyMessage}</p>
+          <div class="card">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:3rem;height:3rem;margin-bottom:1rem;opacity:0.5">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <h3>${emptyMessage}</h3>
             </div>
           </div>
         `;
       }
       
       return `
-        <div class="card-base overflow-hidden">
+        <div class="card overflow-hidden">
           <div class="scrollbar-thin overflow-x-auto">
-            <table class="w-full" role="grid">
+            <table class="w-full table" role="grid">
               <thead>
                 <tr>${selectable ? '<th class="table-header w-10"><input type="checkbox" id="selectAll" class="w-3.5 h-3.5 rounded border-gray-700 text-chaos-500 focus:ring-2 focus:ring-chaos-500" aria-label="Select all"></th>' : ''}${colsHtml}${actions ? '<th class="table-header w-24">Actions</th>' : ''}</tr>
               </thead>
@@ -672,7 +684,7 @@ const EnhancedUI = {
       const statusClass = campaign.status === 'active' ? 'badge-active' : 'badge-inactive';
       
       return `
-        <article class="card-base glass-hover group relative overflow-hidden flex flex-col" style="animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both">
+        <article class="card-interactive card" onclick="openCampaignDetail('${campaign.id}')" style="animation: slideUp 0.4s var(--ease-out) both">
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-chaos-500 to-chaos-600"></div>
           <div class="flex items-start justify-between mb-4">
             <div class="min-w-0">
@@ -683,24 +695,24 @@ const EnhancedUI = {
               <p class="text-[0.625rem] text-gray-500 font-mono mt-1 truncate">${campaign.id}</p>
             </div>
             <div class="dropdown relative ml-2">
-              <button class="btn-icon p-1 opacity-0 group-hover:opacity-100 transition-opacity" onclick="toggleDropdown(this)" aria-label="Campaign actions">
+              <button class="btn-icon p-1 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); toggleDropdown(this)" aria-label="Campaign actions">
                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/></svg>
               </button>
               <div class="dropdown-menu hidden">
-                <button class="dropdown-item" onclick="openCampaignDetail('${campaign.id}')">
+                <button class="dropdown-item" onclick="event.stopPropagation(); openCampaignDetail('${campaign.id}')">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                   View Details
                 </button>
-                <button class="dropdown-item" onclick="copyApiKey('${campaign.apiKey}')">
+                <button class="dropdown-item" onclick="event.stopPropagation(); copyApiKey('${campaign.apiKey}')">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2h-2M8 5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 012-2v-1"/></svg>
                   Copy API Key
                 </button>
-                <button class="dropdown-item" onclick="regenerateCampaignKey('${campaign.id}')">
+                <button class="dropdown-item" onclick="event.stopPropagation(); regenerateCampaignKey('${campaign.id}')">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                   Regenerate Key
                 </button>
                 <div class="dropdown-divider"></div>
-                <button class="dropdown-item danger" onclick="deleteCampaign('${campaign.id}')">
+                <button class="dropdown-item danger" onclick="event.stopPropagation(); deleteCampaign('${campaign.id}')">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                   Delete
                 </button>
@@ -709,25 +721,16 @@ const EnhancedUI = {
           </div>
           
           <div class="grid grid-cols-3 gap-3 mb-4">
-            <div class="text-center p-3 bg-surface-900/50 rounded-xl">
-              <p class="stat-value-sm text-acc-emerald font-mono">${fmtNumber(stats.totalInfections || 0)}</p>
-              <p class="stat-label">Infections</p>
-            </div>
-            <div class="text-center p-3 bg-surface-900/50 rounded-xl">
-              <p class="stat-value-sm text-acc-sky font-mono">${fmtNumber(stats.totalFiles || 0)}</p>
-              <p class="stat-label">Files</p>
-            </div>
-            <div class="text-center p-3 bg-surface-900/50 rounded-xl">
-              <p class="stat-value-sm text-chaos-400 font-mono">${fmtBytes(stats.totalBytes || 0)}</p>
-              <p class="stat-label">Data</p>
-            </div>
+            ${EnhancedUI.components.MetricCard({ label: 'Infections', value: fmtNumber(stats.totalInfections || 0), trend: 0, color: 'success', icon: '🦠' })}
+            ${EnhancedUI.components.MetricCard({ label: 'Files', value: fmtNumber(stats.totalFiles || 0), trend: 0, color: 'info', icon: '📁' })}
+            ${EnhancedUI.components.MetricCard({ label: 'Data', value: fmtBytes(stats.totalBytes || 0), trend: 0, color: 'primary', icon: '💾' })}
           </div>
           
           <div class="flex items-center justify-between pt-3 border-t border-gray-800/50">
-            <span class="text-[0.625rem] text-gray-500">API: <code class="font-mono bg-surface-900 px-2 py-0.5 rounded">${campaign.apiKey?.slice(0, 14)}…</code></span>
+            <span class="text-[0.625rem] text-gray-500">API: <code class="font-mono bg-surface-900 px-2 py-1 rounded">${campaign.apiKey?.slice(0, 14)}…</code></span>
             <div class="flex gap-2">
-              <button class="btn-secondary text-xs" onclick="copyApiKey('${campaign.apiKey}')">Copy Key</button>
-              <button class="btn-primary text-xs" onclick="openCampaignDetail('${campaign.id}')">View</button>
+              <button class="btn btn-secondary text-xs" onclick="event.stopPropagation(); copyApiKey('${campaign.apiKey}')">Copy Key</button>
+              <button class="btn btn-primary text-xs" onclick="event.stopPropagation(); openCampaignDetail('${campaign.id}')">View</button>
             </div>
           </div>
         </article>
@@ -746,14 +749,14 @@ const EnhancedUI = {
       const cfg = configs[type] || configs.system;
       
       return `
-        <div class="toast ${cfg.border} ${cfg.bg} pointer-events-auto" role="alert" style="animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)">
+        <div class="toast ${cfg.border} ${cfg.bg} pointer-events-auto" role="alert" style="animation: slideIn var(--duration-base) var(--ease-out)">
           <div class="toast-icon" style="color: var(--chaos-${type === 'exfil' ? 'primary' : type === 'payment' ? 'success' : type === 'infection' ? 'danger' : 'info'})">${cfg.icon}</div>
           <div class="toast-content">
             <p class="toast-title">${title}</p>
             <p class="toast-message">${message}</p>
             ${actions ? `
               <div class="flex gap-2 mt-3">
-                ${actions.map(a => `<button class="btn-${a.variant || 'secondary'} text-xs" onclick="${a.onClick}; this.closest('.toast').remove()">${a.label}</button>`).join('')}
+                ${actions.map(a => `<button class="btn btn-${a.variant || 'secondary'} text-xs" onclick="${a.onClick}; this.closest('.toast').remove()">${a.label}</button>`).join('')}
               </div>
             ` : ''}
           </div>
@@ -769,13 +772,13 @@ const EnhancedUI = {
       const items = [];
       for (let i = 0; i < count; i++) {
         if (type === 'text') {
-          items.push(`<div class="skeleton h-4 w-${70 + Math.random() * 25} mb-3"></div>`);
+          items.push(`<div class="skeleton skeleton-text" style="width:${70 + Math.random() * 25}%"></div>`);
         } else if (type === 'card') {
-          items.push(`<div class="skeleton h-32 w-full rounded-xl"></div>`);
+          items.push(`<div class="skeleton" style="height:8rem;width:100%;border-radius:var(--radius-lg)"></div>`);
         } else if (type === 'avatar') {
-          items.push(`<div class="skeleton w-10 h-10 rounded-lg"></div>`);
+          items.push(`<div class="skeleton skeleton-circle w-10 h-10"></div>`);
         } else if (type === 'table-row') {
-          items.push(`<div class="skeleton h-12 w-full"></div>`);
+          items.push(`<div class="skeleton" style="height:3rem;width:100%"></div>`);
         }
       }
       return items.join('');
@@ -791,7 +794,7 @@ const EnhancedUI = {
       elements.forEach((el, i) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(8px)';
-        el.style.transition = 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        el.style.transition = 'opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out)';
         setTimeout(() => {
           el.style.opacity = '1';
           el.style.transform = 'translateY(0)';
@@ -817,7 +820,7 @@ const EnhancedUI = {
     },
 
     slideInRight: function(element) {
-      element.style.animation = 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+      element.style.animation = 'slideInRight 0.3s var(--ease-out)';
     },
 
     shake: function(element) {
@@ -879,8 +882,8 @@ const EnhancedUI = {
 // Helper functions
 function getColorHex(name) {
   const colors = {
-    chaos: '#e6731d', emerald: '#0ec77d', amber: '#f59e0b', rose: '#f43f5e',
-    sky: '#0ea5e9', violet: '#8b5cf6', cyan: '#06b6d4'
+    chaos: '#e6731d', success: '#0ec77d', warning: '#f59e0b', danger: '#f43f5e',
+    info: '#0ea5e9', violet: '#8b5cf6', cyan: '#06b6d4'
   };
   return colors[name] || colors.chaos;
 }

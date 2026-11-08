@@ -1,92 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chaos C2 — Command & Control</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            chaos: {
-              50: '#fef7f0', 100: '#fdedeb', 200: '#fad9c9', 300: '#f5bb8a',
-              400: '#ee954d', 500: '#e6731d', 600: '#d45d14', 700: '#b04711',
-              800: '#8d3911', 900: '#713010', 950: '#3d1807'
-            },
-            acc: {
-              emerald: '#0ec77d', emeraldDim: 'rgba(14,199,125,0.12)',
-              amber: '#f59e0b', amberDim: 'rgba(245,158,11,0.12)',
-              rose: '#f43f5e', roseDim: 'rgba(244,63,94,0.12)',
-              sky: '#0ea5e9', skyDim: 'rgba(14,165,233,0.12)',
-              violet: '#8b5cf6', violetDim: 'rgba(139,92,246,0.12)',
-              cyan: '#06b6d4', cyanDim: 'rgba(6,182,212,0.12)'
-            },
-            surface: {
-              950: '#030303', 900: '#0a0a0a', 850: '#111111',
-              800: '#181818', 750: '#1f1f1f', 700: '#262626'
-            }
-          },
-          fontFamily: {
-            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
-          },
-          fontSize: {
-            'xs': ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
-            'sm': ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
-            'base': ['0.9375rem', { lineHeight: '1.55', letterSpacing: '0' }],
-            'lg': ['1.0625rem', { lineHeight: '1.5', letterSpacing: '-0.01em' }],
-            'xl': ['1.25rem', { lineHeight: '1.4', letterSpacing: '-0.02em' }],
-            '2xl': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.02em' }],
-            '3xl': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.03em' }],
-          },
-          spacing: {
-            '18': '4.5rem',
-            '88': '22rem',
-          },
-          borderRadius: {
-            'xl': '0.875rem',
-            '2xl': '1.25rem',
-            '3xl': '1.75rem',
-          },
-          boxShadow: {
-            'glow': '0 0 40px -12px rgba(230,115,29,0.35)',
-            'glow-sm': '0 0 20px -8px rgba(230,115,29,0.25)',
-            'inner-glow': 'inset 0 0 30px rgba(230,115,29,0.05)',
-            'card': '0 4px 24px -4px rgba(0,0,0,0.4), 0 0 0 1px rgba(230,115,29,0.06)',
-            'card-hover': '0 12px 40px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,115,29,0.12)',
-          },
-          animation: {
-            'pulse-slow': 'pulse 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'spin-slow': 'spin 2.5s linear infinite',
-            'fade-in': 'fadeIn 0.25s ease-out',
-            'slide-up': 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-            'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-            'scale-in': 'scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            'shimmer': 'shimmer 2s ease-in-out infinite',
-          },
-          keyframes: {
-            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-            slideUp: { '0%': { opacity: '0', transform: 'translateY(8px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            slideInRight: { '0%': { opacity: '0', transform: 'translateX(8px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
-            scaleIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
-            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-          },
-          backgroundImage: {
-            'grid': 'linear-gradient(rgba(230,115,29,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(230,115,29,0.025) 1px, transparent 1px)',
-            'radial-glow': 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230,115,29,0.06) 0%, transparent 60%)',
-            'mesh': 'radial-gradient(ellipse at 20% 20%, rgba(230,115,29,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(14,199,125,0.05) 0%, transparent 50%)',
-          },
-          backgroundSize: {
-            'grid': '48px 48px',
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/css/design-system.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.umd.min.js"></script>
@@ -96,10 +14,9 @@
     * { font-family: 'Inter', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .font-display { font-family: 'Space Grotesk', sans-serif; }
-    
-    .bg-grid { background-image: linear-gradient(rgba(230,115,29,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(230,115,29,0.025) 1px, transparent 1px); background-size: 48px 48px; }
-    .bg-mesh { background-image: radial-gradient(ellipse at 20% 20%, rgba(230,115,29,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(14,199,125,0.05) 0%, transparent 50%); }
-    .bg-radial { background: radial-gradient(ellipse at 50% 0%, rgba(230,115,29,0.06) 0%, transparent 60%), #030303; }
+    .bg-grid { background-image: linear-gradient(rgba(214,120,30,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(214,120,30,0.025) 1px, transparent 1px); background-size: 48px 48px; }
+    .bg-mesh { background-image: radial-gradient(ellipse at 20% 20%, rgba(214,120,30,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(14,199,125,0.05) 0%, transparent 50%); }
+    .bg-radial { background: radial-gradient(ellipse at 50% 0%, rgba(214,120,30,0.06) 0%, transparent 60%), #030303; }
     
     .scrollbar-thin::-webkit-scrollbar { width: 5px; height: 5px; }
     .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
@@ -107,89 +24,20 @@
     .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #444; }
     .scrollbar-thin::-webkit-scrollbar-corner { background: transparent; }
     
-    .glass { background: rgba(24,24,24,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(230,115,29,0.08); }
-    .glass-strong { background: rgba(18,18,18,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(230,115,29,0.12); }
-    .glass-hover:hover { border-color: rgba(230,115,29,0.2); box-shadow: 0 0 30px -10px rgba(230,115,29,0.15); }
-    
-    .btn-primary { background: linear-gradient(135deg, #d45d14 0%, #e6731d 100%); color: white; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1.125rem; transition: all 0.15s ease; border: none; }
-    .btn-primary:hover { background: linear-gradient(135deg, #e6731d 0%, #ee954d 100%); box-shadow: 0 4px 20px -4px rgba(230,115,29,0.4); }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
-    .btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #e6731d; }
-    
-    .btn-secondary { background: #181818; color: #e8e8e8; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1.125rem; border: 1px solid #2d2d2d; transition: all 0.15s ease; }
-    .btn-secondary:hover { background: #1f1f1f; border-color: #3a3a3a; }
-    .btn-secondary:active { transform: scale(0.98); }
-    .btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #3a3a3a; }
-    
-    .btn-ghost { color: #9ca3af; font-weight: 500; border-radius: 0.625rem; padding: 0.5rem 1rem; transition: all 0.15s ease; }
-    .btn-ghost:hover { color: #fff; background: #181818; }
-    .btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #3a3a3a; }
-    
-    .btn-icon { width: 2.25rem; height: 2.25rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: all 0.15s ease; }
-    .btn-icon:hover { background: #1f1f1f; }
-    .btn-icon:active { transform: scale(0.92); }
-    
-    .input-base { width: 100%; background: #141414; border: 1px solid #2d2d2d; border-radius: 0.625rem; padding: 0.5625rem 0.875rem; color: #fff; transition: all 0.15s ease; font-size: 0.875rem; }
-    .input-base::placeholder { color: #6b7280; }
-    .input-base:focus { outline: none; box-shadow: 0 0 0 2px #e6731d; border-color: transparent; }
-    .input-base:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .card-base { background: #0f0f0f; border: 1px solid #222; border-radius: 1rem; padding: 1.25rem; }
-    .card-elevated { background: #0f0f0f; border: 1px solid #222; border-radius: 1rem; box-shadow: 0 8px 32px -8px rgba(0,0,0,0.5); }
-    
-    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; color: #fff; line-height: 1.15; }
-    .stat-value-sm { font-family: 'JetBrains Mono', monospace; font-size: 1.375rem; font-weight: 600; color: #fff; line-height: 1.2; }
-    .stat-label { font-size: 0.625rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.375rem; font-weight: 500; }
-    
-    .badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1875rem 0.625rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.02em; }
-    .badge-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; flex-shrink: 0; }
-    .badge-active { background: rgba(14,199,125,0.12); color: #0ec77d; }
-    .badge-active .badge-dot { background: #0ec77d; box-shadow: 0 0 8px #0ec77d; animation: pulse 2s ease-in-out infinite; }
-    .badge-inactive { background: #1f1f1f; color: #888; }
-    .badge-inactive .badge-dot { background: #444; }
-    .badge-warning { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .badge-warning .badge-dot { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; animation: pulse 1.5s ease-in-out infinite; }
-    .badge-danger { background: rgba(244,63,94,0.12); color: #f43f5e; }
-    .badge-danger .badge-dot { background: #f43f5e; }
-    .badge-info { background: rgba(14,165,233,0.12); color: #0ea5e9; }
-    .badge-info .badge-dot { background: #0ea5e9; }
-    
-    .tab-btn { padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 500; color: #71717a; border-radius: 0.5rem; transition: all 0.15s ease; position: relative; }
-    .tab-btn:hover { color: #fff; background: #181818; }
-    .tab-btn-active { color: #e6731d; background: rgba(57,21,7,0.4); }
-    .tab-btn-active::after { content: ''; position: absolute; bottom: -0.5rem; left: 50%; transform: translateX(-50%); width: 1.5rem; height: 2px; background: #e6731d; border-radius: 2px; }
-    
-    .table-header { padding: 0.625rem 0.875rem; font-size: 0.5625rem; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em; background: rgba(15,15,15,0.6); position: sticky; top: 0; z-index: 1; }
-    .table-cell { padding: 0.625rem 0.875rem; font-size: 0.8125rem; color: #e8e8e8; border-top: 1px solid #1f1f1f; }
-    .table-row { transition: background 0.12s ease; cursor: pointer; }
-    .table-row:hover { background: rgba(30,30,30,0.6); }
-    .table-row-selected { background: rgba(230,115,29,0.06); }
-    
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.2s ease-out; }
-    .modal-overlay.open { display: flex; }
-    .modal-panel { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 1.25rem; max-width: 48rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 24px 64px -12px rgba(0,0,0,0.7); }
-    
     .chart-container { position: relative; height: 14rem; width: 100%; }
     .chart-container-lg { position: relative; height: 18rem; width: 100%; }
     .chart-container-xl { position: relative; height: 22rem; width: 100%; }
     
-    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.125rem 0.375rem; background: #141414; border: 1px solid #2d2d2d; border-radius: 0.25rem; color: #a1a1aa; }
+    .avatar { width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; }
+    .avatar-sm { width: 1.75rem; height: 1.75rem; font-size: 0.6875rem; }
+    .avatar-lg { width: 3rem; height: 3rem; font-size: 1rem; }
     
-    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.5625rem 0.75rem; border-radius: 0.625rem; color: #71717a; transition: all 0.15s ease; font-size: 0.8125rem; font-weight: 500; }
-    .sidebar-link:hover { color: #fff; background: #181818; }
-    .sidebar-link-active { color: #e6731d; background: rgba(57,21,7,0.4); }
-    .sidebar-link-active::before { content: ''; width: 3px; height: 1.125rem; background: #e6731d; border-radius: 0 3px 3px 0; margin-right: -1px; }
+    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.125rem 0.375rem; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-muted); }
     
-    .toast { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 0.75rem; border: 1px solid; box-shadow: 0 12px 40px -8px rgba(0,0,0,0.5); animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1); min-width: 18rem; max-width: 26rem; }
-    .toast-icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; margin-top: 0.125rem; }
-    .toast-content { flex: 1; min-width: 0; }
-    .toast-title { font-weight: 600; font-size: 0.875rem; color: #fff; margin-bottom: 0.125rem; }
-    .toast-message { font-size: 0.8125rem; color: #a1a1aa; line-height: 1.4; }
-    .toast-close { color: #6b7280; transition: color 0.15s; flex-shrink: 0; }
-    .toast-close:hover { color: #fff; }
-    
-    .skeleton { background: linear-gradient(90deg, #181818 25%, #222 50%, #181818 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 0.375rem; }
+    .tooltip { position: relative; }
+    .tooltip::before { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0.375rem; padding: 0.375rem 0.625rem; background: #111; border: 1px solid #2a2a2a; border-radius: 0.375rem; font-size: 0.6875rem; color: #d4d4d4; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.15s; z-index: 30; }
+    .tooltip::after { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0; border: 5px solid transparent; border-top-color: #2a2a2a; opacity: 0; visibility: hidden; transition: all 0.15s; }
+    .tooltip:hover::before, .tooltip:hover::after { opacity: 1; visibility: visible; }
     
     .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.375rem; min-width: 12rem; background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 0.75rem; box-shadow: 0 16px 48px -12px rgba(0,0,0,0.6); padding: 0.375rem; z-index: 40; animation: scaleIn 0.15s ease-out; }
     .dropdown-item { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: #d4d4d4; font-size: 0.8125rem; font-weight: 500; transition: all 0.12s; background: none; border: none; text-align: left; cursor: pointer; }
@@ -201,28 +49,19 @@
     .progress-ring-bg { fill: none; stroke: #222; stroke-width: 3; }
     .progress-ring-fill { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
     
-    .avatar { width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; }
-    .avatar-sm { width: 1.75rem; height: 1.75rem; font-size: 0.6875rem; }
-    .avatar-lg { width: 3rem; height: 3rem; font-size: 1rem; }
-    
-    .tooltip { position: relative; }
-    .tooltip::before { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0.375rem; padding: 0.375rem 0.625rem; background: #111; border: 1px solid #2a2a2a; border-radius: 0.375rem; font-size: 0.6875rem; color: #d4d4d4; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.15s; z-index: 30; }
-    .tooltip::after { content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 0; border: 5px solid transparent; border-top-color: #2a2a2a; opacity: 0; visibility: hidden; transition: all 0.15s; }
-    .tooltip:hover::before, .tooltip:hover::after { opacity: 1; visibility: visible; }
-    
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
-    
-    .focus-ring:focus-visible { outline: none; box-shadow: 0 0 0 2px #030303, 0 0 0 4px #e6731d; }
-    
-    .text-gradient { background: linear-gradient(135deg, #e6731d 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .text-gradient-emerald { background: linear-gradient(135deg, #0ec77d 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .text-gradient-violet { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    
     .divider-vertical { width: 1px; background: linear-gradient(to bottom, transparent, #2a2a2a, transparent); }
     .divider-horizontal { height: 1px; background: linear-gradient(to right, transparent, #2a2a2a, transparent); }
+    
+    .text-gradient { background: linear-gradient(135deg, #d6781e 0%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .text-gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .text-gradient-violet { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
   </style>
 </head>
 <body class="bg-surface-950 text-gray-100 min-h-screen bg-mesh bg-radial bg-grid antialiased">
+  <a href="#viewContent" class="skip-link">Skip to main content</a>
+  
   <script>
     window.__CHAOS_CONFIG__ = {
       apiBase: '/api',
@@ -252,14 +91,14 @@
         <div class="p-4 border-b border-gray-800/50">
           <label class="block text-[0.5625rem] text-gray-500 uppercase tracking-widest mb-2">Active Campaign</label>
           <div class="relative">
-            <select id="campaignSelect" class="input-base appearance-none pr-8" onchange="switchCampaign(this.value)">
+            <select id="campaignSelect" class="input appearance-none pr-8" onchange="switchCampaign(this.value)">
               <option value="">Select campaign…</option>
             </select>
             <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
           </div>
-          <button class="btn-secondary w-full mt-2 text-xs flex items-center justify-center gap-1.5" onclick="openCampaignModal()">
+          <button class="btn btn-secondary w-full mt-2 flex items-center justify-center gap-1.5" onclick="openCampaignModal()">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
             <span>New Campaign</span>
           </button>
@@ -267,7 +106,7 @@
 
         <!-- Navigation -->
         <nav class="flex-1 p-3 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
-          <a href="#" class="sidebar-link sidebar-link-active" data-view="overview" onclick="showView('overview'); return false;" aria-current="page">
+          <a href="#" class="sidebar-link" data-view="overview" onclick="showView('overview'); return false;" aria-current="page">
             <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             <span>Overview</span>
             <span id="overviewBadge" class="ml-auto badge badge-active hidden"><span class="badge-dot"></span>Live</span>
@@ -331,7 +170,7 @@
           <div class="flex items-center gap-2.5">
             <!-- Theme Selector -->
             <div class="relative hidden sm:block">
-              <select id="themeSelect" class="input-base appearance-none pr-8 w-auto py-1.5 text-sm" onchange="EnhancedUI.themes.applyTheme(this.value)">
+              <select id="themeSelect" class="input appearance-none pr-8 w-auto py-1.5 text-sm" onchange="EnhancedUI.themes.applyTheme(this.value)">
                 <option value="chaos">Chaos</option>
                 <option value="matrix">Matrix</option>
                 <option value="midnight">Midnight</option>
@@ -344,7 +183,7 @@
             </div>
 
             <!-- Time Range -->
-            <select id="timeRange" class="input-base w-auto py-1.5 text-sm hidden md:block" onchange="refreshView()">
+            <select id="timeRange" class="input w-auto py-1.5 text-sm hidden md:block" onchange="refreshView()">
               <option value="1h">1h</option>
               <option value="6h">6h</option>
               <option value="24h" selected>24h</option>
@@ -353,14 +192,14 @@
             </select>
 
             <!-- Refresh Button -->
-            <button id="refreshBtn" class="btn-secondary hidden sm:flex" onclick="refreshView()" aria-label="Refresh data">
+            <button id="refreshBtn" class="btn btn-secondary hidden sm:flex" onclick="refreshView()" aria-label="Refresh data">
               <svg class="w-4 h-4" id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               <span class="hidden sm:inline">Refresh</span>
             </button>
 
             <!-- Auth/User -->
             <div class="flex items-center gap-2">
-              <button id="authBtn" class="btn-ghost text-xs hidden sm:flex" onclick="openAuthModal()">
+              <button id="authBtn" class="btn btn-ghost text-xs hidden sm:flex" onclick="openAuthModal()">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 <span id="authStatus">Sign In</span>
               </button>
@@ -421,7 +260,7 @@
   <div id="modalRoot"></div>
 
   <!-- Toast Container -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toastContainer" class="toast-container pointer-events-none"></div>
 
   <!-- Chart.js Default Config -->
   <script>
@@ -447,5 +286,6 @@
 
   <!-- Main App Script -->
   <script src="/app.js"></script>
+  <script src="/js/command-palette.js"></script>
 </body>
 </html>
